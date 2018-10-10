@@ -37,7 +37,7 @@ func healthCheckHandler(c *gin.Context) {
 
 // servicesHandler reports name and URL of all services seached by aries
 func servicesHandler(c *gin.Context) {
-	c.String(http.StatusOK, "None")
+	c.JSON(http.StatusOK, services)
 }
 
 // resourcesHandler polls all services for info about the specified identifier
