@@ -3,9 +3,9 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 
-build: build-darwin build-linux 
+build: build-darwin build-linux
 
-all: build-darwin build-linux build-web deploy-web
+all: deps build-darwin build-linux build-web deploy-web
 
 build-darwin:
 	GOOS=darwin GOARCH=amd64 $(GOBUILD) -a -o bin/aries.darwin cmd/aries/*.go
@@ -19,6 +19,7 @@ deploy-web:
 
 build-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -a -installsuffix cgo -o bin/aries.linux cmd/aries/*.go
+	cp services.csv bin/services.csv
 
 clean:
 	$(GOCLEAN)

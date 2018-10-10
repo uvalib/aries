@@ -1,21 +1,33 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
 // Version of the service
-const Version = "1.0.0"
+const version = "1.0.0"
+
+// serviceInfo holds name and URL information for a service known to Aries
+type serviceInfo struct {
+	Name string
+	URL  string
+}
+
+// services is a list of services known to Aries
+var services []serviceInfo
 
 // versionHandler reports the version of the serivce
 func versionHandler(c *gin.Context) {
-	c.String(http.StatusOK, "Aries version %s", Version)
+	c.String(http.StatusOK, "Aries version %s", version)
 }
 
 // healthCheckHandler reports the health of the serivce
@@ -34,6 +46,23 @@ func resourcesHandler(c *gin.Context) {
 	c.String(http.StatusNotFound, "%s not found", id)
 }
 
+func initServices() error {
+	file, err := os.Open("services.csv")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		log.Printf("Got service: %s", line)
+		bits := strings.Split(line, ",")
+		services = append(services, serviceInfo{Name: bits[0], URL: bits[1]})
+	}
+
+	return nil
+}
+
 /**
  * MAIN
  */
@@ -41,13 +70,15 @@ func main() {
 	log.Printf("===> Aries staring up <===")
 
 	// Get config params
-	var port, https int
-	var key, crt string
+	var port int
 	flag.IntVar(&port, "port", 8080, "Aries port (default 8080)")
-	flag.IntVar(&https, "https", 0, "Use HTTPS? (default 0)")
-	flag.StringVar(&key, "key", "", "Key for https connection")
-	flag.StringVar(&crt, "crt", "", "Crt for https connection")
 	flag.Parse()
+
+	// Populate the service array with services known to Aries
+	err := initServices()
+	if err != nil {
+		log.Fatal("Unable to load services info")
+	}
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
@@ -68,11 +99,6 @@ func main() {
 	})
 
 	portStr := fmt.Sprintf(":%d", port)
-	if https == 1 {
-		log.Printf("Start HTTPS Aries service on port %s", portStr)
-		log.Fatal(router.RunTLS(portStr, crt, key))
-	} else {
-		log.Printf("Start HTTP Aries service on port %s", portStr)
-		log.Fatal(router.Run(portStr))
-	}
+	log.Printf("Start Aries service on port %s", portStr)
+	log.Fatal(router.Run(portStr))
 }
