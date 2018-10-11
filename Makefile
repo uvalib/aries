@@ -13,6 +13,7 @@ darwin-full: darwin web
 
 darwin:
 	GOOS=darwin GOARCH=amd64 $(GOBUILD) -a -o bin/aries.darwin cmd/aries/*.go
+	cp services.csv bin/services.csv
 
 web:
 	mkdir -p bin/
