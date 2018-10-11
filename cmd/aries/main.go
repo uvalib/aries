@@ -2,12 +2,15 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -43,7 +46,44 @@ func servicesHandler(c *gin.Context) {
 // resourcesHandler polls all services for info about the specified identifier
 func resourcesHandler(c *gin.Context) {
 	id := c.Param("id")
-	c.String(http.StatusNotFound, "%s not found", id)
+	response := make(map[string]map[string]interface{})
+	for _, svc := range services {
+		url := fmt.Sprintf("%s/%s", svc.URL, id)
+		log.Printf("Check %s : %s for identifier %s", svc.Name, svc.URL, id)
+		jsonRespStr := getAriesResponse(url)
+		var jsonMap map[string]interface{}
+		json.Unmarshal([]byte(jsonRespStr), &jsonMap)
+		response[svc.Name] = jsonMap
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+func getAriesResponse(url string) string {
+	timeout := time.Duration(1 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	start := time.Now()
+	resp, err := client.Get(url)
+	elapsed := time.Since(start)
+	if err != nil {
+		log.Printf("ERROR: GET %s failed : %s", url, err.Error())
+		status := http.StatusBadRequest
+		if strings.Contains(err.Error(), "Timeout") {
+			status = http.StatusRequestTimeout
+		}
+		return fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
+			status, err.Error(), elapsed)
+	}
+	defer resp.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	respString := string(bodyBytes)
+	if resp.StatusCode != 200 {
+		return fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
+			resp.StatusCode, respString, elapsed)
+	}
+	return fmt.Sprintf(`{"status": %d, "response": %s, "responseTime": "%s"}`,
+		resp.StatusCode, respString, elapsed)
 }
 
 func initServices() error {
