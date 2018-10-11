@@ -47,18 +47,20 @@ func servicesHandler(c *gin.Context) {
 func resourcesHandler(c *gin.Context) {
 	id := c.Param("id")
 	response := make(map[string]map[string]interface{})
+	channel := make(chan string)
 	for _, svc := range services {
 		url := fmt.Sprintf("%s/%s", svc.URL, id)
 		log.Printf("Check %s : %s for identifier %s", svc.Name, svc.URL, id)
-		jsonRespStr := getAriesResponse(url)
+		go getAriesResponse(url, channel)
 		var jsonMap map[string]interface{}
+		jsonRespStr := <-channel
 		json.Unmarshal([]byte(jsonRespStr), &jsonMap)
 		response[svc.Name] = jsonMap
 	}
 	c.JSON(http.StatusOK, response)
 }
 
-func getAriesResponse(url string) string {
+func getAriesResponse(url string, channel chan string) {
 	timeout := time.Duration(1 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
@@ -72,17 +74,17 @@ func getAriesResponse(url string) string {
 		if strings.Contains(err.Error(), "Timeout") {
 			status = http.StatusRequestTimeout
 		}
-		return fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
+		channel <- fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
 			status, err.Error(), elapsed)
 	}
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	respString := string(bodyBytes)
 	if resp.StatusCode != 200 {
-		return fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
+		channel <- fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
 			resp.StatusCode, respString, elapsed)
 	}
-	return fmt.Sprintf(`{"status": %d, "response": %s, "responseTime": "%s"}`,
+	channel <- fmt.Sprintf(`{"status": %d, "response": %s, "responseTime": "%s"}`,
 		resp.StatusCode, respString, elapsed)
 }
 
