@@ -16,7 +16,7 @@ darwin:
 
 web:
 	mkdir -p bin/
-	cd frontend/; yarn build
+	cd frontend/; yarn install; yarn build
 	rm -rf bin/public
 	mv frontend/dist bin/public
 
