@@ -1,7 +1,7 @@
 <template>
    <div class="header">
-      <router-link :to="{ name: 'home'}"><h1>Aries</h1></router-link>
-      <a target="_blank" href="https://library.virginia.edu"><img src="../assets/uvalogo.png"/></a>
+      <router-link :to="{ name: 'home'}"><span><img class="aries" src="../assets/aries.png"/><span class="app-name">Aries</span></span></router-link>
+      <a target="_blank" href="https://library.virginia.edu"><img class="uva-library" src="../assets/uvalogo.png"/></a>
    </div>
 </template>
 
@@ -17,17 +17,23 @@ div.header {
    color: white;
    padding:20px;
    border-bottom: 1px solid #d2e5f7;
+   text-align: left;
 }
 a {
   color: white;
   text-decoration: none;
 }
-h1 {
-   margin: 0;
-   font-family: 'Righteous', cursive;
-   font-size: 40px;
+div.header span.app-name {
+   margin: 0 25px;
+   font-family: 'Alfa Slab One', cursive;
+   font-size: 50px;
+   position: relative;
 }
-img {
+div.header img.aries {
+  position: relative;
+  top: 8px;
+}
+img.uva-library {
   position: absolute;
   top: 15px;
   right: 15px;

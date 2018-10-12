@@ -31,12 +31,17 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   footer {
-     border-top:1px solid #d2e5f7;
-     background-color: #002F6C;
-     color: #d2e5f7;
-     padding:20px;
-     position:relative;
-     font-size: 0.9em;
+    border-top:1px solid #d2e5f7;
+    background-color: #002F6C;
+    color: #d2e5f7;
+    padding:20px;
+    font-size: 0.9em;
+    width: 100%;
+    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 210px;
   }
 
   footer .external_links {
