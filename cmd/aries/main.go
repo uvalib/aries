@@ -61,7 +61,7 @@ func resourcesHandler(c *gin.Context) {
 }
 
 func getAriesResponse(url string, channel chan string) {
-	timeout := time.Duration(1 * time.Second)
+	timeout := time.Duration(10 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
@@ -76,6 +76,7 @@ func getAriesResponse(url string, channel chan string) {
 		}
 		channel <- fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
 			status, err.Error(), elapsed)
+		return
 	}
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
@@ -83,6 +84,7 @@ func getAriesResponse(url string, channel chan string) {
 	if resp.StatusCode != 200 {
 		channel <- fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
 			resp.StatusCode, respString, elapsed)
+		return
 	}
 	channel <- fmt.Sprintf(`{"status": %d, "response": %s, "responseTime": "%s"}`,
 		resp.StatusCode, respString, elapsed)
