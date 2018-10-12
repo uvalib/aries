@@ -46,21 +46,21 @@ func servicesHandler(c *gin.Context) {
 // resourcesHandler polls all services for info about the specified identifier
 func resourcesHandler(c *gin.Context) {
 	id := c.Param("id")
-	response := make(map[string]map[string]interface{})
+	var out []interface{}
 	channel := make(chan string)
 	for _, svc := range services {
 		url := fmt.Sprintf("%s/%s", svc.URL, id)
 		log.Printf("Check %s : %s for identifier %s", svc.Name, svc.URL, id)
-		go getAriesResponse(url, channel)
+		go getAriesResponse(svc.Name, url, channel)
 		var jsonMap map[string]interface{}
 		jsonRespStr := <-channel
 		json.Unmarshal([]byte(jsonRespStr), &jsonMap)
-		response[svc.Name] = jsonMap
+		out = append(out, jsonMap)
 	}
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, out)
 }
 
-func getAriesResponse(url string, channel chan string) {
+func getAriesResponse(system string, url string, channel chan string) {
 	timeout := time.Duration(10 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
@@ -74,20 +74,20 @@ func getAriesResponse(url string, channel chan string) {
 		if strings.Contains(err.Error(), "Timeout") {
 			status = http.StatusRequestTimeout
 		}
-		channel <- fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
-			status, err.Error(), elapsed)
+		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "responseTime": "%s"}`,
+			system, status, err.Error(), elapsed)
 		return
 	}
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	respString := string(bodyBytes)
 	if resp.StatusCode != 200 {
-		channel <- fmt.Sprintf(`{"status": %d, "response": "%s", "responseTime": "%s"}`,
-			resp.StatusCode, respString, elapsed)
+		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "responseTime": "%s"}`,
+			system, resp.StatusCode, respString, elapsed)
 		return
 	}
-	channel <- fmt.Sprintf(`{"status": %d, "response": %s, "responseTime": "%s"}`,
-		resp.StatusCode, respString, elapsed)
+	channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": %s, "responseTime": "%s"}`,
+		system, resp.StatusCode, respString, elapsed)
 }
 
 func initServices() error {
