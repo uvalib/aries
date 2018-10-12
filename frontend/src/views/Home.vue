@@ -1,18 +1,93 @@
 <template>
   <div class="home main-content">
-    <div class="search-panel">
-      <input id="target-id" type="text" placeholder="Search all repositories">
-      <button class="pure-button">Search</button>
-      <p class="instructions">
-        Enter an identifer in the box above and hit search to find all occurrences in the UVA Library repositories
-      </p>
+    <div v-if="searching" class="search-panel">
+      <h4>Searching...</h4>
+      <img src="../assets/spinner2.gif"/>
+    </div>
+    <div v-else class="search-panel">
+      <input id="target-id" ref="target-id" type="text" placeholder="Search all repositories" :value="searchTerm">
+      <button class="pure-button"  @click="searchClicked">Search</button>
+      <div v-if="errorMsg">
+        <h4 class>Search Failed!</h4>
+        <h4 class="error">{{ this.errorMsg }}</h4>
+      </div>
+      <div v-else>
+        <template v-if="hasResults">
+          <match-detail
+            v-for="result in results"
+            v-bind:key="result.system"
+            v-bind:match="result">
+          </match-detail>
+        </template>
+        <template v-else>
+          <p class="instructions">
+            Enter an identifer in the box above and hit search to find all occurrences in the UVA Library repositories
+          </p>
+          <p class="instructions">
+            Aries searches <b>{{ repoCount }}</b> UVA Library repositories
+          </p>
+        </template>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+  import MatchDetail from '@/components/MatchDetail'
+  import axios from 'axios'
+
   export default {
     name: 'home',
+    components: {
+      'match-detail': MatchDetail
+    },
+
+    data: function () {
+      return {
+        repositories: [],
+        searching: false,
+        searchTerm: "",
+        results: [],
+        errorMsg: ""
+      }
+    },
+
+    computed: {
+      repoCount: function() {
+        return this.repositories.length
+      },
+      hasResults: function() {
+        return this.results.length > 0
+      }
+    },
+
+    created: function () {
+      axios.get("/api/services").then((response)  =>  {
+        this.repositories = response.data
+      })
+    },
+
+    methods: {
+      searchClicked: function() {
+        if (this.searching === true) return
+        this.searchTerm = this.$refs["target-id"].value
+        if ( this.searchTerm.length === 0) return
+
+        this.searching = true
+        this.errorMsg = ""
+        axios.get("/api/resources/"+this.searchTerm).then((response)  =>  {
+          this.results = response.data
+        }).catch((error) => {
+          if (error.response ) {
+            this.errorMsg =  error.response.data
+          } else {
+            this.errorMsg =  error
+          }
+        }).finally(() => {
+          this.searching = false
+        })
+      }
+    }
   }
 </script>
 
@@ -22,6 +97,17 @@
     margin: 2% auto;
     padding: 25px;
     text-align: center;
+  }
+  h4 {
+    width: 50%;
+    margin: 10px auto 0 auto;
+    color: #666
+  }
+  h4.error {
+    margin-top: 5px;
+    color: #922;
+    font-weight: 200;
+    font-style: italic;
   }
   div.search-panel .instructions {
     width:50%;
