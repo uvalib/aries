@@ -25,6 +25,14 @@ type serviceInfo struct {
 	URL  string
 }
 
+// resoursesResponse is the respoonse format for a resources request
+type resoursesResponse struct {
+	SystemsSearched     int           `json:"systems_searched"`
+	Hits                int           `json:"hits"`
+	TotalResponseTimeMS int64         `json:"total_response_time_ms"`
+	Responses           []interface{} `json:"responses"`
+}
+
 // services is a list of services known to Aries
 var services []serviceInfo
 
@@ -46,17 +54,32 @@ func servicesHandler(c *gin.Context) {
 // resourcesHandler polls all services for info about the specified identifier
 func resourcesHandler(c *gin.Context) {
 	id := c.Param("id")
-	var out []interface{}
 	channel := make(chan string)
+	out := resoursesResponse{SystemsSearched: len(services)}
+	start := time.Now()
+
+	// kick off all requests in parallel
 	for _, svc := range services {
 		url := fmt.Sprintf("%s/%s", svc.URL, id)
 		log.Printf("Check %s : %s for identifier %s", svc.Name, svc.URL, id)
 		go getAriesResponse(svc.Name, url, channel)
+	}
+
+	// wait for all to be done and get respnses as they come in
+	for range services {
 		var jsonMap map[string]interface{}
 		jsonRespStr := <-channel
 		json.Unmarshal([]byte(jsonRespStr), &jsonMap)
-		out = append(out, jsonMap)
+
+		if int(jsonMap["status"].(float64)) == 200 {
+			out.Hits++
+		}
+		out.Responses = append(out.Responses, jsonMap)
 	}
+
+	elapsedNanoSec := time.Since(start)
+	out.TotalResponseTimeMS = int64(elapsedNanoSec / time.Millisecond)
+
 	c.JSON(http.StatusOK, out)
 }
 
@@ -67,27 +90,29 @@ func getAriesResponse(system string, url string, channel chan string) {
 	}
 	start := time.Now()
 	resp, err := client.Get(url)
-	elapsed := time.Since(start)
+	elapsedNanoSec := time.Since(start)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
 	if err != nil {
 		log.Printf("ERROR: GET %s failed : %s", url, err.Error())
 		status := http.StatusBadRequest
 		if strings.Contains(err.Error(), "Timeout") {
 			status = http.StatusRequestTimeout
 		}
-		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "responseTime": "%s"}`,
-			system, status, err.Error(), elapsed)
+		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "responseTimeMS": %d}`,
+			system, status, err.Error(), elapsedMS)
 		return
 	}
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	respString := string(bodyBytes)
 	if resp.StatusCode != 200 {
-		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "responseTime": "%s"}`,
-			system, resp.StatusCode, respString, elapsed)
+		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "responseTimeMS": %d}`,
+			system, resp.StatusCode, respString, elapsedMS)
 		return
 	}
-	channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": %s, "responseTime": "%s"}`,
-		system, resp.StatusCode, respString, elapsed)
+	channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": %s, "responseTimeMS": %d}`,
+		system, resp.StatusCode, respString, elapsedMS)
 }
 
 func initServices() error {
