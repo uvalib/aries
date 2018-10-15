@@ -42,6 +42,7 @@
     left: 0;
     bottom: 0;
     height: 210px;
+    font-weight: 500;
   }
 
   footer .external_links {

@@ -99,7 +99,7 @@ func getAriesResponse(system string, url string, channel chan string) {
 		if strings.Contains(err.Error(), "Timeout") {
 			status = http.StatusRequestTimeout
 		}
-		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "responseTimeMS": %d}`,
+		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "response_time_ms": %d}`,
 			system, status, err.Error(), elapsedMS)
 		return
 	}
@@ -107,11 +107,11 @@ func getAriesResponse(system string, url string, channel chan string) {
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	respString := string(bodyBytes)
 	if resp.StatusCode != 200 {
-		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "responseTimeMS": %d}`,
+		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "response_time_ms": %d}`,
 			system, resp.StatusCode, respString, elapsedMS)
 		return
 	}
-	channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": %s, "responseTimeMS": %d}`,
+	channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": %s, "response_time_ms": %d}`,
 		system, resp.StatusCode, respString, elapsedMS)
 }
 

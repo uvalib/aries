@@ -17,9 +17,9 @@
             <b>{{ repoCount }}</b> systems searched in <b>{{searchTime}}ms</b><br/> Matches: <b>{{ hits }}</b>
           </p>
           <match-detail
-            v-for="result in results"
-            v-bind:key="result.system"
-            v-bind:match="result">
+            v-for="hit in matches"
+            v-bind:key="hit.system"
+            v-bind:match="hit">
           </match-detail>
         </template>
         <template v-else>
@@ -50,7 +50,7 @@
         repositories: [],
         searching: false,
         searchTerm: "",
-        results: [],
+        matches: [],
         searchTime: 0,
         errorMsg: ""
       }
@@ -61,10 +61,10 @@
         return this.repositories.length
       },
       hasResults: function() {
-        return this.results.length > 0
+        return this.matches.length > 0
       },
       hits: function() {
-        return this.results.length
+        return this.matches.length
       }
     },
 
@@ -87,7 +87,7 @@
           for (let i=0; i<response.data.responses.length; i++) {
             let resp = response.data.responses[i]
             if (resp.status == 200) {
-              this.results.push(resp)
+              this.matches.push(resp)
             }
           }
         }).catch((error) => {
@@ -96,6 +96,7 @@
           } else {
             this.errorMsg =  error
           }
+          this.matches = []
         }).finally(() => {
           this.searching = false
         })
