@@ -12,7 +12,10 @@
         <h4 class="error">{{ this.errorMsg }}</h4>
       </div>
       <div v-else>
-        <template v-if="hasResults">
+        <template v-if="searchTerm">
+          <p class="instructions">
+            <b>{{ repoCount }}</b> systems searched in <b>{{searchTime}}ms</b><br/> Matches: <b>{{ hits }}</b>
+          </p>
           <match-detail
             v-for="result in results"
             v-bind:key="result.system"
@@ -48,6 +51,7 @@
         searching: false,
         searchTerm: "",
         results: [],
+        searchTime: 0,
         errorMsg: ""
       }
     },
@@ -58,6 +62,9 @@
       },
       hasResults: function() {
         return this.results.length > 0
+      },
+      hits: function() {
+        return this.results.length
       }
     },
 
@@ -76,7 +83,13 @@
         this.searching = true
         this.errorMsg = ""
         axios.get("/api/resources/"+this.searchTerm).then((response)  =>  {
-          this.results = response.data
+          this.searchTime = response.data.total_response_time_ms
+          for (let i=0; i<response.data.responses.length; i++) {
+            let resp = response.data.responses[i]
+            if (resp.status == 200) {
+              this.results.push(resp)
+            }
+          }
         }).catch((error) => {
           if (error.response ) {
             this.errorMsg =  error.response.data

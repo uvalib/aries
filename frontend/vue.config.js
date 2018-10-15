@@ -3,6 +3,7 @@
 //    https://github.com/chimurai/http-proxy-middleware#proxycontext-config
 module.exports = {
   devServer: {
+    public: process.env.BASE_URL,
     proxy: {
       '/api': {
         target: process.env.ARIES_API, // or 'http://localhost:8095',
