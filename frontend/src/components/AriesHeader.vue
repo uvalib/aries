@@ -15,7 +15,7 @@ export default {
 div.header {
    background-color: #002F6C;
    color: white;
-   padding:20px;
+   padding:15px;
    border-bottom: 1px solid #d2e5f7;
    text-align: left;
 }
@@ -24,8 +24,8 @@ a {
   text-decoration: none;
 }
 div.header span.app-name {
-   margin: 0 25px;
-   font-family: 'Alfa Slab One', cursive;
+   margin: 0 15px;
+   font-family: 'Fahkwang', sans-serif;
    font-size: 50px;
    position: relative;
 }

@@ -6,54 +6,108 @@
       <div class="pure-u-3-4 data">{{ identifiers }}</div>
 
       <div class="pure-u-1-4 label"><span>Public URL:</span></div>
-      <div class="pure-u-3-4 data" v-html="publicURL"/>
+      <div class="pure-u-3-4 data">
+        <url-list :urls="publicURLs"/>
+      </div>
 
       <div class="pure-u-1-4 label"><span>Admin URL:</span></div>
-      <div class="pure-u-3-4 data"><a :href="adminURL" target="_blank">{{ adminURL }}</a></div>
+      <div class="pure-u-3-4 data">
+        <url-list :urls="adminURLs"/>
+      </div>
 
       <div class="pure-u-1-4 label"><span>Service URL:</span></div>
-      <div class="pure-u-3-4 data"></div>
+      <div class="pure-u-3-4 data">
+        <url-list :urls="serviceURLs"/>
+      </div>
 
       <div class="pure-u-1-4 label"><span>Metadata URL:</span></div>
-      <div class="pure-u-3-4 data"></div>
+      <div class="pure-u-3-4 data">
+        <url-list :urls="metadataURLs"/>
+      </div>
 
       <div class="pure-u-1-4 label"><span>Master File:</span></div>
-      <div class="pure-u-3-4 data"></div>
+      <div class="pure-u-3-4 data">
+        <file-list :files="masterFiles"/>
+      </div>
 
-      <div class="pure-u-1-4 label"><span>Derivitaive File:</span></div>
-      <div class="pure-u-3-4 data"></div>
+      <div class="pure-u-1-4 label"><span>Derivative File:</span></div>
+      <div class="pure-u-3-4 data">
+        <file-list :files="derivatives"/>
+      </div>
 
       <div class="pure-u-1-4 label"><span>Access Restriction:</span></div>
-      <div class="pure-u-3-4 data"></div>
+      <div class="pure-u-3-4 data" v-html="accessRestriction"/>
     </div>
   </div>
 </template>
 
 <script>
+  import UrlList from '@/components/UrlList'
+  import FileList from '@/components/FileList'
+
   export default {
     name: 'match-detail',
+    components: {
+      'url-list': UrlList,
+      'file-list': FileList
+    },
     props: {
       match: Object
     },
     computed: {
+      renderNA: function() {
+        return "<span style='color:#aaa;font-style: italic'>N/A</span>"
+      },
       identifiers: function() {
         return this.match.response.identifier.join(", ")
       },
-      adminURL: function() {
-        return this.match.response.administrative_url[0]
+      adminURLs: function() {
+        return this.match.response.administrative_url
       },
-      publicURL: function() {
+      publicURLs: function() {
+        return this.match.response.access_url
+      },
+      metadataURLs: function() {
+        return this.match.response.metadata_url
+      },
+      serviceURLs: function() {
+        return this.match.response.service_url
+      },
+      accessRestriction: function() {
         let resp = this.match.response
-        if ( !resp.access_url || resp.access_url.length == 0) {
-          return "<span style='color:#aaa;font-style: italic'>N/A</span>"
+        if (resp.access_restriction) {
+          return "<span>"+resp.access_restriction+"</span>"
+        } else {
+          return this.renderNA
         }
-        return "FOO"
+      },
+      derivatives: function() {
+        return this.match.response.derivative_file
+      },
+      masterFiles: function() {
+        return this.match.response.master_file
+      }
+    },
+    methods: {
+      getURLs: function(urlArray) {
+        let out = ""
+        urlArray.forEach( function(url) {
+          if (out.length > 0) {
+            out += "<br/>"
+          }
+          out = out + "<a href='"+url+"' target='_blank'>"+url+"</a>"
+        })
+        return out
       }
     }
   }
 </script>
 
 <style scoped>
+  ol {
+    margin: 0;
+    padding-inline-start: 20px;
+  }
   div.result {
     width: 75%;
     margin: 0 auto;
@@ -90,10 +144,14 @@
   div.label span {
     padding-right: 10px;
   }
+  span.na {
+    color:#aaa;
+    font-style: italic;
+  }
   a {
     color: #6495ed;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 500;
   }
   a:hover {
    text-decoration: underline;

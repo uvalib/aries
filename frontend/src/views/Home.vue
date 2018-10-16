@@ -69,6 +69,7 @@
     },
 
     created: function () {
+      this.repositories = []
       axios.get("/api/services").then((response)  =>  {
         this.repositories = response.data
       })
@@ -80,6 +81,7 @@
         this.searchTerm = this.$refs["target-id"].value
         if ( this.searchTerm.length === 0) return
 
+        this.matches = []
         this.searching = true
         this.errorMsg = ""
         axios.get("/api/resources/"+this.searchTerm).then((response)  =>  {
