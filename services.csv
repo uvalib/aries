@@ -1,4 +1,4 @@
-Apollo,http://apollo.lib.virginia.edu/api/aries
-TrackSys,http://tracksys.lib.virginia.edu/api/aries
+Apollo,https://apollo.lib.virginia.edu/api/aries
+TrackSys,https://tracksys.lib.virginia.edu/api/aries
 IIIF,http://docker1.lib.virginia.edu:8419/api/aries
 Archivematica,http://docker1.lib.virginia.edu:8423/api/aries
