@@ -5,38 +5,52 @@
       <div class="pure-u-1-4 label"><span>Identifiers:</span></div>
       <div class="pure-u-3-4 data">{{ identifiers }}</div>
 
-      <div class="pure-u-1-4 label"><span>Public URL:</span></div>
-      <div class="pure-u-3-4 data">
-        <url-list :urls="publicURLs"/>
-      </div>
+      <template v-if="publicURLs">
+        <div class="pure-u-1-4 label"><span>Public URL:</span></div>
+        <div class="pure-u-3-4 data">
+          <url-list :urls="publicURLs"/>
+        </div>
+      </template>
 
-      <div class="pure-u-1-4 label"><span>Admin URL:</span></div>
-      <div class="pure-u-3-4 data">
-        <url-list :urls="adminURLs"/>
-      </div>
+      <template v-if="adminURLs">
+        <div class="pure-u-1-4 label"><span>Admin URL:</span></div>
+        <div class="pure-u-3-4 data">
+          <url-list :urls="adminURLs"/>
+        </div>
+      </template>
 
-      <div class="pure-u-1-4 label"><span>Service URL:</span></div>
-      <div class="pure-u-3-4 data">
-        <url-list :urls="serviceURLs"/>
-      </div>
+      <template v-if="serviceURLs">
+        <div class="pure-u-1-4 label"><span>Service URL:</span></div>
+        <div class="pure-u-3-4 data">
+          <url-list :urls="serviceURLs"/>
+        </div>
+      </template>
 
-      <div class="pure-u-1-4 label"><span>Metadata URL:</span></div>
-      <div class="pure-u-3-4 data">
-        <url-list :urls="metadataURLs"/>
-      </div>
+      <template v-if="metadataURLs">
+        <div class="pure-u-1-4 label"><span>Metadata URL:</span></div>
+        <div class="pure-u-3-4 data">
+          <url-list :urls="metadataURLs"/>
+        </div>
+      </template>
 
-      <div class="pure-u-1-4 label"><span>Master File:</span></div>
-      <div class="pure-u-3-4 data">
-        <file-list :files="masterFiles"/>
-      </div>
+      <template v-if="masterFiles">
+        <div class="pure-u-1-4 label"><span>Master File:</span></div>
+        <div class="pure-u-3-4 data">
+          <file-list :files="masterFiles"/>
+        </div >
+      </template>
 
-      <div class="pure-u-1-4 label"><span>Derivative File:</span></div>
-      <div class="pure-u-3-4 data">
-        <file-list :files="derivatives"/>
-      </div>
+      <template v-if="derivatives">
+        <div class="pure-u-1-4 label"><span>Derivative File:</span></div>
+        <div class="pure-u-3-4 data">
+          <file-list :files="derivatives"/>
+        </div>
+      </template>
 
-      <div class="pure-u-1-4 label"><span>Access Restriction:</span></div>
-      <div class="pure-u-3-4 data" v-html="accessRestriction"/>
+      <template v-if="match.response.access_restriction">
+        <div class="pure-u-1-4 label"><span>Access Restriction:</span></div>
+        <div class="pure-u-3-4 data" v-html="accessRestriction"/>
+      </template>
     </div>
   </div>
 </template>
@@ -86,18 +100,6 @@
       },
       masterFiles: function() {
         return this.match.response.master_file
-      }
-    },
-    methods: {
-      getURLs: function(urlArray) {
-        let out = ""
-        urlArray.forEach( function(url) {
-          if (out.length > 0) {
-            out += "<br/>"
-          }
-          out = out + "<a href='"+url+"' target='_blank'>"+url+"</a>"
-        })
-        return out
       }
     }
   }

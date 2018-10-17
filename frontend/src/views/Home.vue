@@ -5,7 +5,7 @@
       <img src="../assets/spinner2.gif"/>
     </div>
     <div v-else class="search-panel">
-      <input id="target-id" ref="target-id" type="text" placeholder="Search all repositories" :value="searchTerm">
+      <input id="target-id" ref="target-id" type="text" @keyup.enter="searchClicked" placeholder="Search all repositories" :value="searchTerm">
       <button class="pure-button"  @click="searchClicked">Search</button>
       <div v-if="errorMsg">
         <h4 class>Search Failed!</h4>
@@ -111,7 +111,6 @@
   div.search-panel {
     width: 70%;
     margin: 2% auto;
-    padding: 25px;
     text-align: center;
   }
   h4 {
