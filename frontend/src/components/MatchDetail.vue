@@ -8,42 +8,42 @@
       <template v-if="publicURLs">
         <div class="pure-u-1-4 label"><span>Public URL:</span></div>
         <div class="pure-u-3-4 data">
-          <url-list :urls="publicURLs"/>
+          <MatchDetailURLList :urls="publicURLs"/>
         </div>
       </template>
 
       <template v-if="adminURLs">
         <div class="pure-u-1-4 label"><span>Admin URL:</span></div>
         <div class="pure-u-3-4 data">
-          <url-list :urls="adminURLs"/>
+          <MatchDetailURLList :urls="adminURLs"/>
         </div>
       </template>
 
       <template v-if="serviceURLs">
         <div class="pure-u-1-4 label"><span>Service URL:</span></div>
         <div class="pure-u-3-4 data">
-          <url-list :urls="serviceURLs"/>
+          <MatchDetailItemList :items="serviceURLs"/>
         </div>
       </template>
 
       <template v-if="metadataURLs">
         <div class="pure-u-1-4 label"><span>Metadata URL:</span></div>
         <div class="pure-u-3-4 data">
-          <url-list :urls="metadataURLs"/>
+          <MatchDetailItemList :items="metadataURLs"/>
         </div>
       </template>
 
       <template v-if="masterFiles">
         <div class="pure-u-1-4 label"><span>Master File:</span></div>
         <div class="pure-u-3-4 data">
-          <file-list :files="masterFiles"/>
+          <MatchDetailFileList :files="masterFiles"/>
         </div >
       </template>
 
       <template v-if="derivatives">
         <div class="pure-u-1-4 label"><span>Derivative File:</span></div>
         <div class="pure-u-3-4 data">
-          <file-list :files="derivatives"/>
+          <MatchDetailFileList :files="derivatives"/>
         </div>
       </template>
 
@@ -56,14 +56,15 @@
 </template>
 
 <script>
-  import UrlList from '@/components/UrlList'
-  import FileList from '@/components/FileList'
+  import MatchDetailURLList from '@/components/MatchDetailURLList'
+  import MatchDetailFileList from '@/components/MatchDetailFileList'
+  import MatchDetailItemList from '@/components/MatchDetailItemList'
 
   export default {
-    name: 'match-detail',
     components: {
-      'url-list': UrlList,
-      'file-list': FileList
+      MatchDetailURLList,
+      MatchDetailItemList,
+      MatchDetailFileList
     },
     props: {
       match: Object

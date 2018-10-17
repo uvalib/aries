@@ -5,6 +5,7 @@
       <img src="../assets/spinner2.gif"/>
     </div>
     <div v-else class="search-panel">
+      <h4>Identifier Search</h4>
       <input id="target-id" ref="target-id" type="text" @keyup.enter="searchClicked" placeholder="Search all repositories" :value="searchTerm">
       <button class="pure-button"  @click="searchClicked">Search</button>
       <div v-if="errorMsg">
@@ -16,18 +17,18 @@
           <p class="instructions">
             <b>{{ repoCount }}</b> systems searched in <b>{{searchTime}}ms</b><br/> Matches: <b>{{ hits }}</b>
           </p>
-          <match-detail
+          <MatchDetail
             v-for="hit in matches"
             v-bind:key="hit.system"
             v-bind:match="hit">
-          </match-detail>
+          </MatchDetail>
         </template>
         <template v-else>
           <p class="instructions">
             Enter an identifer in the box above and hit search to find all occurrences in the UVA Library repositories
           </p>
           <p class="instructions">
-            Aries searches <b>{{ repoCount }}</b> UVA Library repositories
+            Aries will search <b>{{ repoCount }}</b> repositories
           </p>
         </template>
       </div>
@@ -42,7 +43,7 @@
   export default {
     name: 'home',
     components: {
-      'match-detail': MatchDetail
+      MatchDetail
     },
 
     data: function () {

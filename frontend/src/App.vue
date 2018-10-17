@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <aries-header/>
+    <AriesHeader/>
     <router-view/>
-    <aries-footer/>
+    <AriesFooter/>
   </div>
 </template>
 
@@ -13,8 +13,8 @@
 
   export default {
     components: {
-      'aries-header': AriesHeader,
-      'aries-footer': AriesFooter
+      AriesHeader,
+      AriesFooter
     }
   }
 </script>

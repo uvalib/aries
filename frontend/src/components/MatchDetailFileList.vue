@@ -12,9 +12,11 @@
 
 <script>
   export default {
-    name: 'file-list',
     props: {
-      files: Array
+      files: {
+        type: Array,
+        required: true
+      }
     }
   }
 </script>
