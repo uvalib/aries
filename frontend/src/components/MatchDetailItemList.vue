@@ -24,7 +24,6 @@
     },
     methods: {
       getItemType: function(item) {
-        console.log("Get type for "+item)
         for (var key in item) {
           if (key !== "url") {
             return {name: key, value: item[key]}

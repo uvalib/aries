@@ -12,7 +12,7 @@ linux-full: linux web
 darwin-full: darwin web
 
 darwin:
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -a -o bin/aries.darwin cmd/aries/*.go
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) -a -o bin/aries.darwin backend/*.go
 	cp services.csv bin/services.csv
 
 web:
@@ -22,7 +22,7 @@ web:
 	mv frontend/dist bin/public
 
 linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -a -installsuffix cgo -o bin/aries.linux cmd/aries/*.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -a -installsuffix cgo -o bin/aries.linux backend/*.go
 	cp services.csv bin/services.csv
 
 clean:
