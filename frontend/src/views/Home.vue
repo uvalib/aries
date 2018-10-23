@@ -110,7 +110,6 @@
 
 <style scoped>
   div.search-panel {
-    width: 70%;
     margin: 2% auto;
     text-align: center;
   }

@@ -28,7 +28,3 @@ linux:
 clean:
 	$(GOCLEAN)
 	rm -rf bin
-
-deps:
-	dep ensure
-	dep status

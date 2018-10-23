@@ -2,3 +2,4 @@ Apollo,https://apollo.lib.virginia.edu/api
 TrackSys,https://tracksys.lib.virginia.edu/api
 IIIF,http://docker1.lib.virginia.edu:8419/api
 Archivematica,http://docker1.lib.virginia.edu:8423/api
+IIIF Manifest,http://docker1.lib.virginia.edu:8390/api
