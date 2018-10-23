@@ -73,7 +73,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-	router.GET("/favison.ico", favHandler)
+	router.GET("/favicon.ico", favHandler)
 	router.GET("/version", versionHandler)
 	router.GET("/healthcheck", healthCheckHandler)
 	api := router.Group("/api")
