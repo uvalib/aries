@@ -79,7 +79,7 @@
     methods: {
       searchClicked: function() {
         if (this.searching === true) return
-        this.searchTerm = this.$refs["target-id"].value
+        this.searchTerm = this.$refs["target-id"].value.trim()
         if ( this.searchTerm.length === 0) return
 
         this.matches = []
