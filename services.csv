@@ -4,3 +4,4 @@ IIIF,http://docker1.lib.virginia.edu:8419/api
 Archivematica,http://docker1.lib.virginia.edu:8423/api
 IIIF Manifest,https://iiifman.lib.virginia.edu/api
 PDF Hosting,http://dockerprod1.lib.virginia.edu:8316/api
+Viewer,https://doviewer.lib.virginia.edu/api
