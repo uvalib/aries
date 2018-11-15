@@ -20,8 +20,10 @@
       <div v-else>
         <template v-if="searchTerm">
           <p class="instructions">
-            <b>{{ repoCount }}</b> systems searched in <b>{{searchTime}}ms</b><br/> Matches: <b>{{ hits }}</b>
+            <span @click="showRepos" title="View Repositories" class="view-repo"><b>{{ repoCount }}</b> repositories</span>
+             searched in <b>{{searchTime}}ms</b><br/> Matches: <b>{{ hits }}</b>
           </p>
+          <RepositoryList v-if="showRepoList" :repositories="repositories"/>
           <MatchDetail
             v-for="hit in matches"
             v-bind:key="hit.system"
@@ -36,8 +38,8 @@
             Aries will search
             <span @click="showRepos" title="View Repositories" class="view-repo"><b>{{ repoCount }}</b> repositories</span>
           </p>
+          <RepositoryList v-if="showRepoList" :repositories="repositories"/>
         </template>
-        <RepositoryList v-if="showRepoList" :repositories="repositories"/>
       </div>
     </div>
   </div>
