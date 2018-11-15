@@ -46,6 +46,7 @@
 <script>
   import MatchDetail from '@/components/MatchDetail'
   import RepositoryList from '@/components/RepositoryList'
+  import EventBus from '@/EventBus'
   import axios from 'axios'
 
   export default {
@@ -86,7 +87,15 @@
       })
     },
 
+    mounted: function (){
+      EventBus.$on("close-repos-clicked", this.handleCloseRepoClicked)
+    },
+
     methods: {
+      handleCloseRepoClicked: function() {
+        this.showRepoList = false
+      },
+
       showRepos: function() {
         this.showRepoList = true
       },
