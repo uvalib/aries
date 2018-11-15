@@ -15,9 +15,9 @@ const version = "1.0.0"
 
 // serviceInfo holds name and URL information for a service known to Aries
 type serviceInfo struct {
-	Name string
-	URL  string
-	OK   bool
+	Name string `json:"name"`
+	URL  string `json:"url"`
+	OK   bool   `json:"alive"`
 }
 
 // resoursesResponse is the respoonse format for a resources request
@@ -72,6 +72,7 @@ func main() {
 	}
 
 	gin.SetMode(gin.ReleaseMode)
+	gin.DisableConsoleColor()
 	router := gin.Default()
 	router.GET("/favicon.ico", favHandler)
 	router.GET("/version", versionHandler)

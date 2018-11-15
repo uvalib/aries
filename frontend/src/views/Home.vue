@@ -6,8 +6,13 @@
     </div>
     <div v-else class="search-panel">
       <h4>Identifier Search</h4>
-      <input id="target-id" ref="target-id" type="text" @keyup.enter="searchClicked" placeholder="Search all repositories" :value="searchTerm">
-      <button class="pure-button"  @click="searchClicked">Search</button>
+      <div class="pure-button-group" role="group">
+        <input id="target-id" ref="target-id" type="text" @keyup.enter="searchClicked" placeholder="Search all repositories" :value="searchTerm">
+        <button id="search-btn" class="pure-button"  @click="searchClicked">
+          <i class="fas fa-search"></i>
+          Search
+        </button>
+        </div>
       <div v-if="errorMsg">
         <h4 class>Search Failed!</h4>
         <h4 class="error">{{ this.errorMsg }}</h4>
@@ -25,12 +30,14 @@
         </template>
         <template v-else>
           <p class="instructions">
-            Enter an identifer in the box above and hit search to find all occurrences in the UVA Library repositories
+            Enter an identifer in the box above and hit search to find all<br/>occurrences in the UVA Library repositories
           </p>
-          <p class="instructions">
-            Aries will search <b>{{ repoCount }}</b> repositories
+          <p class="instructions" v-if="!showRepoList">
+            Aries will search
+            <span @click="showRepos" title="View Repositories" class="view-repo"><b>{{ repoCount }}</b> repositories</span>
           </p>
         </template>
+        <RepositoryList v-if="showRepoList" :repositories="repositories"/>
       </div>
     </div>
   </div>
@@ -38,12 +45,14 @@
 
 <script>
   import MatchDetail from '@/components/MatchDetail'
+  import RepositoryList from '@/components/RepositoryList'
   import axios from 'axios'
 
   export default {
     name: 'home',
     components: {
-      MatchDetail
+      MatchDetail,
+      RepositoryList
     },
 
     data: function () {
@@ -53,7 +62,8 @@
         searchTerm: "",
         matches: [],
         searchTime: 0,
-        errorMsg: ""
+        errorMsg: "",
+        showRepoList: false
       }
     },
 
@@ -77,6 +87,10 @@
     },
 
     methods: {
+      showRepos: function() {
+        this.showRepoList = true
+      },
+
       searchClicked: function() {
         if (this.searching === true) return
         this.searchTerm = this.$refs["target-id"].value.trim()
@@ -115,7 +129,7 @@
   }
   h4 {
     width: 50%;
-    margin: 10px auto 0 auto;
+    margin: 10px auto 10px auto;
     color: #666
   }
   h4.error {
@@ -130,11 +144,26 @@
     color: #666;
   }
   #target-id {
-    margin: 10px;
     width: 50%;
-    padding: 5px 10px;
     border-radius: 2px;
     outline: none;
     border: 1px solid #ccc;
+    padding: 7px 14px;
+    border-right: 0;
+    border-radius: 20px 0 0 20px;
+  }
+  #search-btn {
+    padding: 8px 14px;
+    border-radius: 0 20px 20px 0;
+    color: #666;
+    font-weight: 500;
+  }
+  .view-repo {
+    font-weight: 500;
+     color: cornflowerblue;
+     cursor:pointer
+  }
+  .view-repo:hover {
+    text-decoration: underline
   }
 </style>
