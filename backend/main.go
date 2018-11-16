@@ -11,12 +11,12 @@ import (
 )
 
 // Version of the service
-const version = "1.0.0"
+const version = "1.1.0"
 
 // serviceInfo holds name and URL information for a service known to Aries
 type serviceInfo struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	Name string `json:"name" binding:"required"`
+	URL  string `json:"url" binding:"required"`
 	OK   bool   `json:"alive"`
 }
 
@@ -43,9 +43,9 @@ func versionHandler(c *gin.Context) {
 // healthCheckHandler reports the health of the serivce
 func healthCheckHandler(c *gin.Context) {
 	hcMap := make(map[string]string)
-	hcMap["alive"] = "true"
+	hcMap["Aries"] = "true"
 	for _, svc := range services {
-		if pingService(svc) {
+		if pingService(svc, false) {
 			hcMap[svc.Name] = "true"
 		} else {
 			hcMap[svc.Name] = "false"
@@ -81,6 +81,7 @@ func main() {
 	{
 		api.GET("/resources/:id", resourcesHandler)
 		api.GET("/services", servicesHandler)
+		api.POST("/services", serviceAddHandler)
 	}
 	router.Use(static.Serve("/", static.LocalFile("./public", true)))
 

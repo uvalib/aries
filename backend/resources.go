@@ -24,15 +24,12 @@ func resourcesHandler(c *gin.Context) {
 	outstandingRequests := 0
 	for _, svc := range services {
 		if svc.OK == false {
-			log.Printf("Service %s is currently not active. See if it is now available...", svc.Name)
-			if !pingService(svc) {
-				log.Printf("   ...Skipping")
-				out.Responses = append(out.Responses, gin.H{
-					"system": svc.Name, "status": http.StatusServiceUnavailable,
-					"response": "system is offline", "response_time_ms": 0,
-				})
-				continue
-			}
+			log.Printf("Service %s is currently not active", svc.Name)
+			out.Responses = append(out.Responses, gin.H{
+				"system": svc.Name, "status": http.StatusServiceUnavailable,
+				"response": "system is offline", "response_time_ms": 0,
+			})
+			continue
 		}
 		log.Printf("Check %s : %s for identifier %s", svc.Name, svc.URL, id)
 		outstandingRequests++
