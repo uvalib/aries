@@ -1,5 +1,6 @@
 <template>
-  <div class="list-wrapper">
+  <LoadingSpinner message="Loading repository information...." v-if="loading"/>
+  <div v-else class="list-wrapper">
     <h4>Aries Repositories<span @click="closeRepoList" class="hide-repos">Close</span></h4>  
     <table>
       <tr>
@@ -17,14 +18,31 @@
 
 <script>
 import EventBus from '@/EventBus'
+import LoadingSpinner from '@/components/LoadingSpinner'
+import axios from 'axios'
+
 export default {
   name: "RepositoryList",
-  props: {
-    repositories: {
-      type: Array,
-      required: true
+
+  components: {
+    LoadingSpinner
+  },
+
+  data: function () {
+    return {
+      repositories: [],
+      loading: true
     }
   },
+
+  created: function () {
+    this.repositories = []
+    axios.get("/api/services").then((response)  =>  {
+      this.repositories = response.data
+      this.loading = false
+    })
+  },
+
   methods: { 
     closeRepoList: function() {
       EventBus.$emit("close-repos-clicked")

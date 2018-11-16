@@ -23,7 +23,7 @@
             <span @click="showRepos" title="View Repositories" class="view-repo"><b>{{ repoCount }}</b> repositories</span>
              searched in <b>{{searchTime}}ms</b><br/> Matches: <b>{{ hits }}</b>
           </p>
-          <RepositoryList v-if="showRepoList" :repositories="repositories"/>
+          <RepositoryList v-if="showRepoList"/>
           <MatchDetail
             v-for="hit in matches"
             v-bind:key="hit.system"
@@ -38,7 +38,7 @@
             Aries will search
             <span @click="showRepos" title="View Repositories" class="view-repo"><b>{{ repoCount }}</b> repositories</span>
           </p>
-          <RepositoryList v-if="showRepoList" :repositories="repositories"/>
+          <RepositoryList v-if="showRepoList"/>
         </template>
       </div>
     </div>
@@ -60,7 +60,7 @@
 
     data: function () {
       return {
-        repositories: [],
+        repoCount: 0,
         searching: false,
         searchTerm: "",
         matches: [],
@@ -85,7 +85,7 @@
     created: function () {
       this.repositories = []
       axios.get("/api/services").then((response)  =>  {
-        this.repositories = response.data
+        this.repoCount = response.data.length
       })
     },
 
