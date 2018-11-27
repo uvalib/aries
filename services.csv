@@ -1,7 +1,0 @@
-Apollo,https://apollo.lib.virginia.edu/api
-TrackSys,https://tracksys.lib.virginia.edu/api
-IIIF,http://dockerprod1.lib.virginia.edu:8419/api
-Archivematica,http://dockerprod1.lib.virginia.edu:8423/api
-IIIF Manifest,https://iiifman.lib.virginia.edu/api
-PDF Hosting,http://dockerprod1.lib.virginia.edu:8316/api
-Curio,https://curio.lib.virginia.edu/api

@@ -1,17 +1,87 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 )
+
+// serviceInfo holds name and URL information for a service known to Aries
+type serviceInfo struct {
+	ID int 		`json:"id"`
+	Name string `json:"name" binding:"required"`
+	URL  string `json:"url" binding:"required"`
+	OK   bool   `json:"alive"`
+}
+// services is a list of services known to Aries
+var services []*serviceInfo
+
+// The redis connection
+var redisClient *redis.Client
+
+// initServices will read services from the specified redis instance and create a list of services.
+// Each one will be will be checked to see if it is alive and this status is tracked.
+func initServices(host string, port int, pass string) error {
+	redisHost := fmt.Sprintf("%s:%d", host, port)
+	log.Printf("Connect to redis instance at %s", redisHost)
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     redisHost,
+		Password: pass,
+		DB:       0, // use default DB
+	})
+
+	// See if the connection is good...
+	_, err := redisClient.Ping().Result()
+	if err != nil {
+		return err
+	}
+
+	// Notes on redis data:
+	//   aries:services contains a list of IDs for each service present
+	//   aries:service:[id] contains a hash with service details; name and url
+	//   aries:next_service_id is the next available ID for a new service
+
+	// Get all of the service IDs, iterate them to get details and
+	// establish connection / status
+	svcIDs := redisClient.SMembers("aries:services").Val()
+	for _, svcID := range svcIDs {
+		redisID := fmt.Sprintf("aries:service:%s", svcID)
+		svcInfo, svcErr := redisClient.HGetAll(redisID).Result()
+		if svcErr != nil {
+			log.Printf("Unable to get info for service %s", redisID)
+			continue
+		}
+
+		// create a and track a service; assume it is not alive by default
+		// ping  will test and update this alive status
+		svc := &serviceInfo{Name: svcInfo["name"], URL: svcInfo["url"], OK: false}
+		services = append(services, svc)
+		log.Printf("Init %s - %s...", svc.Name, svc.URL)
+		if !pingService(svc, false) {
+			log.Printf("   * %s is not available", svc.Name)
+		} else {
+			log.Printf("   * %s is alive", svc.Name)
+		}
+	}
+
+	// Start a ticker to periodically poll servivces and mark them
+	// active or inactive. The weird syntax puts the polling of
+	// the ticker channel an a goroutine so it doesn't block
+	ticker := time.NewTicker(60 * time.Second)
+	go func() {
+		for range ticker.C {
+			log.Printf("Service check heartbeat")
+			pingAllServices()
+		}
+	}()
+
+	return nil
+}
 
 // servicesHandler is a gin GET request handler. It
 // reports name URL and status of all services seached by aries
@@ -53,45 +123,6 @@ func serviceAddHandler(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, "%s added", newSvc.Name)
-}
-
-// initServices will parse the services CSV file and create a list of available services.
-// Each one will be will be checked to see if it is alive and this status is tracked.
-func initServices() error {
-	file, err := os.Open("services.csv")
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		bits := strings.Split(line, ",")
-
-		// create a and track a service; assume it is not alive by default
-		// ping  will test and update this alive status
-		svc := &serviceInfo{Name: bits[0], URL: bits[1], OK: false}
-		services = append(services, svc)
-		log.Printf("Init new sevice %s - %s...", svc.Name, svc.URL)
-		if !pingService(svc, false) {
-			log.Printf("   * %s is not available", svc.Name)
-		} else {
-			log.Printf("   * %s is alive", svc.Name)
-		}
-	}
-
-	// Start a ticker to periodically poll servivces and mark them
-	// active or inactive. The weird syntax puts the polling of
-	// the ticker channel an a goroutine so it doesn't block
-	ticker := time.NewTicker(60 * time.Second)
-	go func() {
-		for range ticker.C {
-			log.Printf("Service check heartbeat")
-			pingAllServices()
-		}
-	}()
-
-	return nil
 }
 
 func pingAllServices() {

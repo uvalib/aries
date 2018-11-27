@@ -12,6 +12,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// resoursesResponse is the respoonse format for a resources request
+type resoursesResponse struct {
+	SystemsSearched     int           `json:"systems_searched"`
+	Hits                int           `json:"hits"`
+	TotalResponseTimeMS int64         `json:"total_response_time_ms"`
+	Responses           []interface{} `json:"responses"`
+}
+
 // resourcesHandler is a gin GET handler for /api/respices/:ID.
 // it polls all services for info about the specified identifier
 func resourcesHandler(c *gin.Context) {

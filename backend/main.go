@@ -11,25 +11,7 @@ import (
 )
 
 // Version of the service
-const version = "1.1.0"
-
-// serviceInfo holds name and URL information for a service known to Aries
-type serviceInfo struct {
-	Name string `json:"name" binding:"required"`
-	URL  string `json:"url" binding:"required"`
-	OK   bool   `json:"alive"`
-}
-
-// resoursesResponse is the respoonse format for a resources request
-type resoursesResponse struct {
-	SystemsSearched     int           `json:"systems_searched"`
-	Hits                int           `json:"hits"`
-	TotalResponseTimeMS int64         `json:"total_response_time_ms"`
-	Responses           []interface{} `json:"responses"`
-}
-
-// services is a list of services known to Aries
-var services []*serviceInfo
+const version = "1.2.0"
 
 // favHandler is a dummy handler to silence browser API requests that look for /favicon.ico
 func favHandler(c *gin.Context) {
@@ -60,17 +42,24 @@ func healthCheckHandler(c *gin.Context) {
 func main() {
 	log.Printf("===> Aries staring up <===")
 
-	// Get config params
-	var port int
+	// Get config params; service port and redis info
+	log.Printf("Read configuration...")
+	var port,redisPort int
+	var redisHost, redisPass string
 	flag.IntVar(&port, "port", 8080, "Aries port (default 8080)")
+	flag.StringVar(&redisHost, "redis_host", "localhost", "Redis host (default localhost)")
+	flag.IntVar(&redisPort, "redis_port", 6379, "Redis port (default 6379)")
+	flag.StringVar(&redisPass, "redis_pass", "", "Redis password")
 	flag.Parse()
 
 	// Populate the service array with services known to Aries
-	err := initServices()
+	log.Printf("Init Services...")
+	err := initServices(redisHost, redisPort, redisPass)
 	if err != nil {
 		log.Fatal("Unable to load services info")
 	}
 
+	log.Printf("Setup routes...")
 	gin.SetMode(gin.ReleaseMode)
 	gin.DisableConsoleColor()
 	router := gin.Default()
@@ -93,6 +82,6 @@ func main() {
 	})
 
 	portStr := fmt.Sprintf(":%d", port)
-	log.Printf("Start Aries service on port %s", portStr)
+	log.Printf("Start Aries v%s on port %s", version, portStr)
 	log.Fatal(router.Run(portStr))
 }
