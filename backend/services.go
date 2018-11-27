@@ -13,11 +13,12 @@ import (
 
 // serviceInfo holds name and URL information for a service known to Aries
 type serviceInfo struct {
-	ID int 		`json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name" binding:"required"`
 	URL  string `json:"url" binding:"required"`
 	OK   bool   `json:"alive"`
 }
+
 // services is a list of services known to Aries
 var services []*serviceInfo
 
@@ -59,7 +60,7 @@ func initServices(host string, port int, pass string) error {
 
 		// create a and track a service; assume it is not alive by default
 		// ping  will test and update this alive status
-		svc := &serviceInfo{Name: svcInfo["name"], URL: svcInfo["url"], OK: false}
+		svc := &serviceInfo{ID: svcID, Name: svcInfo["name"], URL: svcInfo["url"], OK: false}
 		services = append(services, svc)
 		log.Printf("Init %s - %s...", svc.Name, svc.URL)
 		if !pingService(svc, false) {
