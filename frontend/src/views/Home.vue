@@ -71,9 +71,6 @@
     },
 
     computed: {
-      repoCount: function() {
-        return this.repositories.length
-      },
       hasResults: function() {
         return this.matches.length > 0
       },
