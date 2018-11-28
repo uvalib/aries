@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +15,7 @@ import (
 
 // serviceInfo holds name and URL information for a service known to Aries
 type serviceInfo struct {
-	ID   string `json:"id"`
+	ID   int64  `json:"id,string"`
 	Name string `json:"name" binding:"required"`
 	URL  string `json:"url" binding:"required"`
 	OK   bool   `json:"alive"`
@@ -50,8 +52,9 @@ func initServices(host string, port int, pass string) error {
 	// Get all of the service IDs, iterate them to get details and
 	// establish connection / status
 	svcIDs := redisClient.SMembers("aries:services").Val()
-	for _, svcID := range svcIDs {
-		redisID := fmt.Sprintf("aries:service:%s", svcID)
+	for _, svcIDStr := range svcIDs {
+		svcID, _ := strconv.ParseInt(svcIDStr, 10, 64)
+		redisID := fmt.Sprintf("aries:service:%d", svcID)
 		svcInfo, svcErr := redisClient.HGetAll(redisID).Result()
 		if svcErr != nil {
 			log.Printf("Unable to get info for service %s", redisID)
@@ -92,38 +95,82 @@ func servicesHandler(c *gin.Context) {
 
 // serviceAddHandler will add/update a service contained in the post params. It will then
 // ping that service and ensure the response is the expected format
-// Call example: curl -d '{"name":"NAME", "url":"URL"}' -H "Content-Type: application/json" -X POST https://aries.lib.virginia.edu/api/services
+// Call example: curl -d '{id: "ID", "name":"NAME", "url":"URL"}' -H "Content-Type: application/json" -X POST https://aries.lib.virginia.edu/api/services
 func serviceAddHandler(c *gin.Context) {
-	// Pull ServiceName and ServiceURL from query params
-	var newSvc serviceInfo
-	err := c.Bind(&newSvc)
+	// Pull ID, ServiceName and ServiceURL from query params
+	var postedSvc serviceInfo
+	err := c.BindJSON(&postedSvc)
 	if err != nil {
 		log.Printf("Bad request to update service: %s", err.Error())
 		c.String(http.StatusBadRequest, "invalid request")
 		return
 	}
-	log.Printf("Request to add/update service: %s - %s", newSvc.Name, newSvc.URL)
+	log.Printf("Request to add/update service: %d: %s - %s", postedSvc.ID, postedSvc.Name, postedSvc.URL)
 
 	// Before anything gets updated, ping the service and verify the response matches
 	// expected format: [ServiceName] Aries API
-	if !pingService(&newSvc, true) {
+	if !pingService(&postedSvc, true) {
 		c.String(http.StatusBadRequest, "invalid request")
 		return
 	}
 
-	updated := false
+	// Service is OK. Update reddis and local data
+	// see if service is new or an existing one...
+	var existingService *serviceInfo
 	for _, svc := range services {
-		if svc.Name == newSvc.Name {
-			svc.URL = newSvc.URL
-			log.Printf("%s URL updated to %s", svc.Name, svc.URL)
+		if svc.ID == postedSvc.ID {
+			log.Printf("Service %d exists; update it", svc.ID)
+			existingService = svc
 		}
 	}
-	if updated == false {
-		services = append(services, &newSvc)
-		log.Printf("Added new service")
+
+	if existingService == nil {
+		log.Printf("A new service is being added; get an ID for it")
+		newID, err := redisClient.Incr("aries:aries:next_service_id").Result()
+		if err != nil {
+			log.Printf("Unable to get ID new service")
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+		postedSvc.ID = newID
+		redisErr := updateRedis(&postedSvc, true)
+		if redisErr != nil {
+			log.Printf("Unable to get update redis %s", redisErr.Error())
+			c.String(http.StatusInternalServerError, redisErr.Error())
+			return
+		}
+		services = append(services, &postedSvc)
+	} else {
+		redisErr := updateRedis(&postedSvc, false)
+		if redisErr != nil {
+			log.Printf("Unable to get update redis %s", redisErr.Error())
+			c.String(http.StatusInternalServerError, redisErr.Error())
+			return
+		}
+		existingService.Name = postedSvc.Name
+		existingService.URL = postedSvc.URL
 	}
 
-	c.String(http.StatusOK, "%s added", newSvc.Name)
+	c.String(http.StatusOK, "ok")
+}
+
+func updateRedis(svcInfo *serviceInfo, newService bool) error {
+	// hmset aries:service:[ID] name [NAME] url [URL]
+	redisID := fmt.Sprintf("aries:service:%d", svcInfo.ID)
+	_, err := redisClient.HMSet(redisID, map[string]interface{}{
+		"id":   svcInfo.ID,
+		"name": svcInfo.Name,
+		"url":  svcInfo.URL,
+	}).Result()
+	if err != nil {
+		return err
+	}
+
+	// This is a new service.. add the ID to aries:services
+	if newService {
+		_, err = redisClient.SAdd("aries:services", svcInfo.ID).Result()
+	}
+	return err
 }
 
 func pingAllServices() {
@@ -179,8 +226,7 @@ func pingService(svc *serviceInfo, nameCheck bool) bool {
 	}
 
 	if nameCheck {
-		expected := fmt.Sprintf("%s Aries API", svc.Name)
-		if string(respTxt) != expected {
+		if strings.Contains(string(respTxt), " Aries API") == false {
 			log.Printf("   * FAIL: Service %s returned unexpected response [%s]", svc.Name, respTxt)
 			svc.OK = false
 			return false

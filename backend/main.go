@@ -44,7 +44,7 @@ func main() {
 
 	// Get config params; service port and redis info
 	log.Printf("Read configuration...")
-	var port,redisPort int
+	var port, redisPort int
 	var redisHost, redisPass string
 	flag.IntVar(&port, "port", 8080, "Aries port (default 8080)")
 	flag.StringVar(&redisHost, "redis_host", "localhost", "Redis host (default localhost)")
