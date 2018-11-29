@@ -38,9 +38,9 @@ Run the frontend in development mode with `yarn serve` from the frontend directo
 
 ### Redis Notes
 
-This repo includes a file containg some initial services. It is found in `redis_seed.txt`. To run it:
+This repo includes a file containg some initial services. It is found in `redis_seed.txt`. IMPORTANT: This file has a placeholder `ARIES_PREFIX` as the redis key for all values. In the command below, sed replaces that placeholder with `aries`. Be sure to substitute `aries` with the correct prefix for the installation:
 
-* `cat redis_seed.txt |  host] [-p port] -[a auth]`
+* `cat redis_seed.txt | sed s/ARIES_PREFIX/aries/g | redis-cli [-h host] [-p port] -[a auth]`
   
 The services Aries knows about are manintained in a redis instance. To see what keys it current uses, execute:
 
