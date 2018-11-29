@@ -50,6 +50,10 @@ func main() {
 	flag.StringVar(&redisHost, "redis_host", "localhost", "Redis host (default localhost)")
 	flag.IntVar(&redisPort, "redis_port", 6379, "Redis port (default 6379)")
 	flag.StringVar(&redisPass, "redis_pass", "", "Redis password")
+
+	// NOTE: redisKeyPrefix is a string define in services.go
+	flag.StringVar(&redisKeyPrefix, "redis_prefix", "aries", "Redis key prefix")
+	
 	flag.Parse()
 
 	// Populate the service array with services known to Aries

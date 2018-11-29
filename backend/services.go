@@ -23,6 +23,7 @@ type serviceInfo struct {
 
 // services is a list of services known to Aries
 var services []*serviceInfo
+var redisKeyPrefix string
 
 // The redis connection
 var redisClient *redis.Client
@@ -51,10 +52,11 @@ func initServices(host string, port int, pass string) error {
 
 	// Get all of the service IDs, iterate them to get details and
 	// establish connection / status
-	svcIDs := redisClient.SMembers("aries:services").Val()
+	servicesKey := fmt.Sprintf("%s:services", redisKeyPrefix)
+	svcIDs := redisClient.SMembers(servicesKey).Val()
 	for _, svcIDStr := range svcIDs {
 		svcID, _ := strconv.ParseInt(svcIDStr, 10, 64)
-		redisID := fmt.Sprintf("aries:service:%d", svcID)
+		redisID := fmt.Sprintf("%s:service:%d", redisKeyPrefix, svcID)
 		svcInfo, svcErr := redisClient.HGetAll(redisID).Result()
 		if svcErr != nil {
 			log.Printf("Unable to get info for service %s", redisID)
@@ -97,7 +99,6 @@ func servicesHandler(c *gin.Context) {
 // ping that service and ensure the response is the expected format
 // Call example: curl -d '{id: "ID", "name":"NAME", "url":"URL"}' -H "Content-Type: application/json" -X POST https://aries.lib.virginia.edu/api/services
 func serviceAddHandler(c *gin.Context) {
-	// Pull ID, ServiceName and ServiceURL from query params
 	var postedSvc serviceInfo
 	err := c.BindJSON(&postedSvc)
 	if err != nil {
@@ -126,7 +127,8 @@ func serviceAddHandler(c *gin.Context) {
 
 	if existingService == nil {
 		log.Printf("A new service is being added; get an ID for it")
-		newID, err := redisClient.Incr("aries:aries:next_service_id").Result()
+		serviceIDKey := fmt.Sprintf("%s:next_service_id", redisKeyPrefix)
+		newID, err := redisClient.Incr(serviceIDKey).Result()
 		if err != nil {
 			log.Printf("Unable to get ID new service")
 			c.String(http.StatusInternalServerError, err.Error())
@@ -156,7 +158,7 @@ func serviceAddHandler(c *gin.Context) {
 
 func updateRedis(svcInfo *serviceInfo, newService bool) error {
 	// hmset aries:service:[ID] name [NAME] url [URL]
-	redisID := fmt.Sprintf("aries:service:%d", svcInfo.ID)
+	redisID := fmt.Sprintf("%s:service:%d", redisKeyPrefix, svcInfo.ID)
 	_, err := redisClient.HMSet(redisID, map[string]interface{}{
 		"id":   svcInfo.ID,
 		"name": svcInfo.Name,
@@ -168,7 +170,8 @@ func updateRedis(svcInfo *serviceInfo, newService bool) error {
 
 	// This is a new service.. add the ID to aries:services
 	if newService {
-		_, err = redisClient.SAdd("aries:services", svcInfo.ID).Result()
+		servicesKey := fmt.Sprintf("%s:services", redisKeyPrefix)
+		_, err = redisClient.SAdd(servicesKey, svcInfo.ID).Result()
 	}
 	return err
 }
