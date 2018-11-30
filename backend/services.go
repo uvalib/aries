@@ -97,7 +97,7 @@ func servicesHandler(c *gin.Context) {
 
 // serviceAddHandler will add/update a service contained in the post params. It will then
 // ping that service and ensure the response is the expected format
-// Call example: curl -d '{id: "ID", "name":"NAME", "url":"URL"}' -H "Content-Type: application/json" -X POST https://aries.lib.virginia.edu/api/services
+// Call example: curl -d '{"id": "ID", "name":"NAME", "url":"URL"}' -H "Content-Type: application/json" -X POST https://aries.lib.virginia.edu/api/services
 func serviceAddHandler(c *gin.Context) {
 	var postedSvc serviceInfo
 	err := c.BindJSON(&postedSvc)

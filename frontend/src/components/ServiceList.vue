@@ -1,16 +1,18 @@
 <template>
-  <LoadingSpinner message="Loading services information..." v-if="loading"/>
-  <div v-else class="list-wrapper">
+  <div class="list-wrapper">
     <h4>Aries Services<span @click="closeRepoList" class="hide-services">Close</span></h4>  
     <table>
       <tr>
-        <th>Service</th><th>URL</th><th>Alive</th>
+        <th>Service</th><th>URL</th><th style="text-align:center">Status</th>
       </tr>
       <tr v-for="svc in services"
-          v-bind:key="svc.name">
+          v-bind:key="svc.id">
         <td>{{svc.name}}</td>
         <td>{{svc.url}}</td>
-        <td>{{svc.alive}}</td>
+        <td style="text-align:center">
+          <span v-if="svc.alive"  class="indicator online"></span>
+          <span v-else class="indicator offline"></span>
+        </td>
       </tr>
     </table>
   </div>
@@ -18,26 +20,17 @@
 
 <script>
 import EventBus from '@/EventBus'
-import LoadingSpinner from '@/components/LoadingSpinner'
 
 export default {
   name: "ServiceList",
 
   components: {
-    LoadingSpinner
   },
 
   computed: {
     services: function() {
         return this.$store.getters.services
-    },
-    loading: function() {
-        return this.$store.getters.isLoading
     }
-  },
-
-  created: function () {
-    this.$store.dispatch('getServices')
   },
 
   methods: { 
@@ -86,5 +79,17 @@ table th {
   border-bottom: 1px solid #ccc;
   border-top: 1px solid #ccc;
   color: #666;
+}
+span.indicator {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 15px;
+}
+span.indicator.online {
+  background: #7c7;
+}
+span.offline {
+  background: #c55;
 }
 </style>

@@ -65,7 +65,8 @@
         matches: [],
         searchTime: 0,
         errorMsg: "",
-        showServiceList: false
+        showServiceList: false,
+        pollInterval: -1
       }
     },
 
@@ -82,11 +83,15 @@
     },
 
     created: function () {
+      EventBus.$on("close-services-clicked", this.closeServicesClicked)
       this.$store.dispatch('getServices')
+      this.pollInterval = setInterval( ()=>{  this.$store.dispatch('getServices') }, 15*1000)
     },
 
-    mounted: function (){
-      EventBus.$on("close-services-clicked", this.closeServicesClicked)
+    destroyed: function() {
+      if ( this.pollInterval > -1) {
+        clearInterval(this.pollInterval)
+      }
     },
 
     methods: {
