@@ -45,7 +45,7 @@ export default {
 
   methods: { 
     closeRepoList: function() {
-      EventBus.$emit("close-repos-clicked")
+      EventBus.$emit("close-services-clicked")
     }
   }
 }

@@ -12,7 +12,7 @@ const state = {
 
 // state getter functions. All are functions that take state as the first param 
 // and the getters themselves as the second param. Getter params are passed 
-// as a function
+// as a function. Access as a property like: this.$store.getters.NAME
 const getters = {
   isLoading: state => {
     return state.loading
@@ -26,7 +26,7 @@ const getters = {
     return state.services.find(service => service.id === id)
   },
   
-  servicesCount: state => {
+  serviceCount: state => {
     return state.services.length
   }
 }

@@ -7,7 +7,7 @@
     <div v-else class="search-panel">
       <h4>Identifier Search</h4>
       <div class="pure-button-group" role="group">
-        <input id="target-id" ref="target-id" type="text" @keyup.enter="searchClicked" placeholder="Search all repositories" :value="searchTerm">
+        <input id="target-id" ref="target-id" type="text" @keyup.enter="searchClicked" placeholder="Search all services" :value="searchTerm">
         <button id="search-btn" class="pure-button"  @click="searchClicked">
           <i class="fas fa-search"></i>
           Search
@@ -20,10 +20,10 @@
       <div v-else>
         <template v-if="searchTerm">
           <p class="instructions">
-            <span @click="showRepos" title="View Repositories" class="view-repo"><b>{{ repoCount }}</b> repositories</span>
+            <span @click="showServices" title="View Services" class="view-services"><b>{{ serviceCount }}</b> services</span>
              searched in <b>{{searchTime}}ms</b><br/> Matches: <b>{{ hits }}</b>
           </p>
-          <RepositoryList v-if="showRepoList"/>
+          <RepositoryList v-if="showServiceList"/>
           <MatchDetail
             v-for="hit in matches"
             v-bind:key="hit.system"
@@ -32,13 +32,13 @@
         </template>
         <template v-else>
           <p class="instructions">
-            Enter an identifer in the box above and hit search to find all<br/>occurrences in the UVA Library repositories
+            Enter an identifer in the box above and hit search to find all<br/>occurrences in UVA Library services
           </p>
-          <p class="instructions" v-if="!showRepoList">
+          <p class="instructions" v-if="!showServiceList">
             Aries will search
-            <span @click="showRepos" title="View Repositories" class="view-repo"><b>{{ repoCount }}</b> repositories</span>
+            <span @click="showServices" title="View Services" class="view-services"><b>{{ serviceCount }}</b> services</span>
           </p>
-          <RepositoryList v-if="showRepoList"/>
+          <RepositoryList v-if="showServiceList"/>
         </template>
       </div>
     </div>
@@ -60,13 +60,12 @@
 
     data: function () {
       return {
-        repoCount: 0,
         searching: false,
         searchTerm: "",
         matches: [],
         searchTime: 0,
         errorMsg: "",
-        showRepoList: false
+        showServiceList: false
       }
     },
 
@@ -76,27 +75,27 @@
       },
       hits: function() {
         return this.matches.length
+      },
+      serviceCount: function() {
+        return this.$store.getters.serviceCount
       }
     },
 
     created: function () {
-      this.repositories = []
-      axios.get("/api/services").then((response)  =>  {
-        this.repoCount = response.data.length
-      })
+      this.$store.dispatch('getServices')
     },
 
     mounted: function (){
-      EventBus.$on("close-repos-clicked", this.handleCloseRepoClicked)
+      EventBus.$on("close-services-clicked", this.closeServicesClicked)
     },
 
     methods: {
-      handleCloseRepoClicked: function() {
-        this.showRepoList = false
+      closeServicesClicked: function() {
+        this.showServiceList = false
       },
 
-      showRepos: function() {
-        this.showRepoList = true
+      showServices: function() {
+        this.showServiceList = true
       },
 
       searchClicked: function() {
@@ -166,12 +165,12 @@
     color: #666;
     font-weight: 500;
   }
-  .view-repo {
+  .view-services {
     font-weight: 500;
      color: cornflowerblue;
      cursor:pointer
   }
-  .view-repo:hover {
+  .view-services:hover {
     text-decoration: underline
   }
 </style>
