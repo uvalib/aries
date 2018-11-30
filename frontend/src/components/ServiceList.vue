@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import EventBus from '@/EventBus'
 
 export default {
   name: "ServiceList",
@@ -29,13 +28,13 @@ export default {
 
   computed: {
     services: function() {
-        return this.$store.getters.services
+      return this.$store.getters.services
     }
   },
 
   methods: { 
     closeRepoList: function() {
-      EventBus.$emit("close-services-clicked")
+      this.$root.$emit("close-services-clicked")
     }
   }
 }

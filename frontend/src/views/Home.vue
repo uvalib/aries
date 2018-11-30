@@ -48,7 +48,6 @@
 <script>
   import MatchDetail from '@/components/MatchDetail'
   import ServiceList from '@/components/ServiceList'
-  import EventBus from '@/EventBus'
   import axios from 'axios'
 
   export default {
@@ -83,7 +82,7 @@
     },
 
     created: function () {
-      EventBus.$on("close-services-clicked", this.closeServicesClicked)
+      this.$root.$on("close-services-clicked", this.closeServicesClicked)
       this.$store.dispatch('getServices')
       this.pollInterval = setInterval( ()=>{  this.$store.dispatch('getServices') }, 15*1000)
     },
