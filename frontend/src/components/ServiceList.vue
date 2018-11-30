@@ -1,16 +1,16 @@
 <template>
-  <LoadingSpinner message="Loading repository information...." v-if="loading"/>
+  <LoadingSpinner message="Loading services information..." v-if="loading"/>
   <div v-else class="list-wrapper">
-    <h4>Aries Repositories<span @click="closeRepoList" class="hide-repos">Close</span></h4>  
+    <h4>Aries Services<span @click="closeRepoList" class="hide-services">Close</span></h4>  
     <table>
       <tr>
         <th>Service</th><th>URL</th><th>Alive</th>
       </tr>
-      <tr v-for="repo in repositories"
-          v-bind:key="repo.name">
-        <td>{{repo.name}}</td>
-        <td>{{repo.url}}</td>
-        <td>{{repo.alive}}</td>
+      <tr v-for="svc in services"
+          v-bind:key="svc.name">
+        <td>{{svc.name}}</td>
+        <td>{{svc.url}}</td>
+        <td>{{svc.alive}}</td>
       </tr>
     </table>
   </div>
@@ -19,28 +19,25 @@
 <script>
 import EventBus from '@/EventBus'
 import LoadingSpinner from '@/components/LoadingSpinner'
-import axios from 'axios'
 
 export default {
-  name: "RepositoryList",
+  name: "ServiceList",
 
   components: {
     LoadingSpinner
   },
 
-  data: function () {
-    return {
-      repositories: [],
-      loading: true
+  computed: {
+    services: function() {
+        return this.$store.getters.services
+    },
+    loading: function() {
+        return this.$store.getters.isLoading
     }
   },
 
   created: function () {
-    this.repositories = []
-    axios.get("/api/services").then((response)  =>  {
-      this.repositories = response.data
-      this.loading = false
-    })
+    this.$store.dispatch('getServices')
   },
 
   methods: { 
@@ -56,7 +53,7 @@ h4 {
   margin: 4px 0;
   position: relative;
 }
-.hide-repos {
+.hide-services {
   position: absolute;
   font-weight: 200;
   font-size: 0.8em;
@@ -67,7 +64,7 @@ h4 {
   opacity: 0.6;
   cursor: pointer;
 }
-.hide-repos:hover {
+.hide-services:hover {
   opacity: 1;
 }
 .list-wrapper {

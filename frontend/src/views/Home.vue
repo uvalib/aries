@@ -23,7 +23,7 @@
             <span @click="showServices" title="View Services" class="view-services"><b>{{ serviceCount }}</b> services</span>
              searched in <b>{{searchTime}}ms</b><br/> Matches: <b>{{ hits }}</b>
           </p>
-          <RepositoryList v-if="showServiceList"/>
+          <ServiceList v-if="showServiceList"/>
           <MatchDetail
             v-for="hit in matches"
             v-bind:key="hit.system"
@@ -38,7 +38,7 @@
             Aries will search
             <span @click="showServices" title="View Services" class="view-services"><b>{{ serviceCount }}</b> services</span>
           </p>
-          <RepositoryList v-if="showServiceList"/>
+          <ServiceList v-if="showServiceList"/>
         </template>
       </div>
     </div>
@@ -47,7 +47,7 @@
 
 <script>
   import MatchDetail from '@/components/MatchDetail'
-  import RepositoryList from '@/components/RepositoryList'
+  import ServiceList from '@/components/ServiceList'
   import EventBus from '@/EventBus'
   import axios from 'axios'
 
@@ -55,7 +55,7 @@
     name: 'home',
     components: {
       MatchDetail,
-      RepositoryList
+      ServiceList
     },
 
     data: function () {
