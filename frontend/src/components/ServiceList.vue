@@ -3,16 +3,31 @@
     <h4>Aries Services<span @click="closeRepoList" class="hide-services">Close</span></h4>  
     <table>
       <tr>
-        <th>Service</th><th>URL</th><th style="text-align:center">Status</th>
+        <th></th><th>Service</th><th>URL</th><th style="text-align:center">Status</th>
       </tr>
       <tr v-for="svc in services"
           v-bind:key="svc.id">
-        <td>{{svc.name}}</td>
-        <td>{{svc.url}}</td>
-        <td style="text-align:center">
-          <span v-if="svc.alive"  class="indicator online"></span>
-          <span v-else class="indicator offline"></span>
-        </td>
+        <template v-if="editing(svc.id)">
+          <td colspan="2">
+            <input id="name-edit" :value="editService.name"/>
+          </td>
+          <td >
+            <input id="url-edit" :value="editService.url"/>
+          </td>
+          <td>
+            <span class="icon accept" @click="acceptEditClick"></span>
+            <span class="icon cancel" @click="cancelEditClick"></span>
+          </td>
+        </template> 
+        <template v-else>
+          <td style="text-align: center;"><span @click="editServiceClick" class="icon edit" :data-id="svc.id"></span></td>
+          <td>{{svc.name}}</td>
+          <td>{{svc.url}}</td>
+          <td style="text-align:center">
+            <span v-if="svc.alive"  class="indicator online"></span>
+            <span v-else class="indicator offline"></span>
+          </td>
+        </template>
       </tr>
     </table>
   </div>
@@ -26,6 +41,12 @@ export default {
   components: {
   },
 
+  data: function () {
+    return {
+        editService: null,
+    }
+  },
+
   computed: {
     services: function() {
       return this.$store.getters.services
@@ -33,8 +54,32 @@ export default {
   },
 
   methods: { 
+    editing: function(id) {
+      return this.editService != null && this.editService.id == id
+    },
+
     closeRepoList: function() {
       this.$root.$emit("close-services-clicked")
+    },
+
+    editServiceClick: function(event) {
+      let btn = event.target
+      this.editService = this.$store.getters.getServiceByID( btn.dataset.id )
+    },
+
+    cancelEditClick: function() {
+      this.editService = null
+    },
+
+    acceptEditClick: function() {
+      let input = document.getElementById('name-edit')
+      this.editService.name = input.value
+      input = document.getElementById('url-edit')
+      this.editService.url = input.value
+      this.$store.dispatch('updateService', this.editService)
+
+      // FIXME
+      this.editService = null
     }
   }
 }
@@ -90,5 +135,37 @@ span.indicator.online {
 }
 span.offline {
   background: #c55;
+}
+.icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+  cursor: pointer;
+  vertical-align: inherit;
+}
+.icon:hover {
+  opacity: 1;
+}
+.icon.edit {
+  width: 16px;
+  height: 16px;
+  background-image: url(../assets/edit.png);
+}
+.icon.accept {
+  background-image: url(../assets/accept.png);
+  margin: 0 4px 0 0;
+}
+.icon.cancel {
+  background-image: url(../assets/cancel.png);
+  margin: 0 0 0 4px;
+}
+input {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.85em;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 2px 0 2px 8px;
 }
 </style>

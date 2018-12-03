@@ -59,6 +59,13 @@ const actions = {
     }).catch(() => {
       ctx.commit('setServices', []) 
     })
+  },
+  updateService( ctx, updatedService ) {
+    axios.post("/api/services", updatedService).then((response)  =>  {
+      ctx.commit('updateService', updatedService )
+    }).catch(() => {
+      alert("it broke")
+    })
   }
 }
 
