@@ -111,7 +111,7 @@ func serviceAddHandler(c *gin.Context) {
 	// Before anything gets updated, ping the service and verify the response matches
 	// expected format: [ServiceName] Aries API
 	if !pingService(&postedSvc, true) {
-		c.String(http.StatusBadRequest, "invalid request")
+		c.String(http.StatusBadRequest, "Unable to reach target service")
 		return
 	}
 

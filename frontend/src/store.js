@@ -6,7 +6,8 @@ Vue.use(Vuex)
 
 // root state object. Holds all of the state for the system
 const state = {
-  services: []
+  services: [],
+  error: null
 }
 
 // state getter functions. All are functions that take state as the first param 
@@ -15,6 +16,10 @@ const state = {
 const getters = {
   services: state => {
     return state.services
+  },
+
+  error: state => {
+    return state.error
   },
 
   getServiceByID: state => id => {
@@ -31,6 +36,10 @@ const getters = {
 const mutations = {
   setServices (state, services) {
     state.services = services
+  },
+
+  setError (state, error) {
+    state.error = error
   },
 
   updateService (state, updatedSvc) {
@@ -56,23 +65,26 @@ const actions = {
   getServices( ctx ) {
     axios.get("/api/services").then((response)  =>  {
       ctx.commit('setServices', response.data )
-    }).catch(() => {
+    }).catch((error) => {
       ctx.commit('setServices', []) 
+      ctx.commit('setError', "Internal Error: Unable to reach any services") 
     })
   },
+
   updateService( ctx, updatedService ) {
     axios.post("/api/services", updatedService).then((response)  =>  {
       ctx.commit('updateService', updatedService )
-    }).catch(() => {
-      alert("it broke")
+    }).catch( error => {
+      ctx.commit('setError', "Update Failed: "+ error.response.data) 
     })
   }
 }
 
 // A Vuex instance is created by combining state, getters, actions and mutations
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state,
   getters,
   actions,
   mutations
 })
+export default store

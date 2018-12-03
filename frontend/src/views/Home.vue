@@ -42,6 +42,9 @@
         </template>
       </div>
     </div>
+    <template v-if="hasErrors">
+      <p class="error">{{error}}</p>
+    </template>
   </div>
 </template>
 
@@ -70,6 +73,12 @@
     },
 
     computed: {
+      hasErrors: function() {
+        return this.$store.getters.error != null
+      },
+      error: function() {
+        return this.$store.getters.error
+      },
       hasResults: function() {
         return this.matches.length > 0
       },
@@ -176,5 +185,10 @@
   }
   .view-services:hover {
     text-decoration: underline
+  }
+  .error {
+    text-align: center;
+    color: #c55;
+    font-weight: bold;
   }
 </style>
