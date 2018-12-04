@@ -52,7 +52,7 @@ export default {
       return this.$store.getters.services
     }
   },
-
+  
   methods: { 
     editing: function(id) {
       return this.editService != null && this.editService.id == id
@@ -77,8 +77,6 @@ export default {
       input = document.getElementById('url-edit')
       this.editService.url = input.value
       this.$store.dispatch('updateService', this.editService)
-
-      // FIXME
       this.editService = null
     }
   }

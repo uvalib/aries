@@ -64,8 +64,13 @@ const mutations = {
 const actions = {
   getServices( ctx ) {
     axios.get("/api/services").then((response)  =>  {
-      ctx.commit('setServices', response.data )
-    }).catch((error) => {
+      if ( response.status === 200) {
+        ctx.commit('setServices', response.data )
+      } else {
+        ctx.commit('setServices', []) 
+        ctx.commit('setError', "Internal Error: "+response.data) 
+      }
+    }).catch(() => {
       ctx.commit('setServices', []) 
       ctx.commit('setError', "Internal Error: Unable to reach any services") 
     })
@@ -73,18 +78,33 @@ const actions = {
 
   updateService( ctx, updatedService ) {
     axios.post("/api/services", updatedService).then((response)  =>  {
-      ctx.commit('updateService', updatedService )
+      if (response.status == 200 ) {
+        ctx.commit('updateService', updatedService )
+      } else {
+        ctx.commit('setError', "Update Failed: "+ response.data) 
+      }
     }).catch( error => {
       ctx.commit('setError', "Update Failed: "+ error.response.data) 
     })
   }
 }
 
+// Plugin to listen for error messages being set. After a delay, clear them
+const errorPlugin = store => {
+  store.subscribe((mutation) => {
+    if (mutation.type === "setError") {
+      if ( mutation.payload != null ) {
+        setTimeout( ()=>{ store.commit('setError', null)}, 6000)
+      }
+    }
+  })
+}
+
 // A Vuex instance is created by combining state, getters, actions and mutations
-const store = new Vuex.Store({
+export default new Vuex.Store({
   state,
   getters,
   actions,
-  mutations
+  mutations,
+  plugins: [errorPlugin] 
 })
-export default store
