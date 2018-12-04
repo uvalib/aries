@@ -52,6 +52,7 @@ func initServices(host string, port int, pass string) error {
 
 	// Get all of the service IDs, iterate them to get details and
 	// establish connection / status
+	log.Printf("Connected; reading services...")
 	servicesKey := fmt.Sprintf("%s:services", redisKeyPrefix)
 	svcIDs := redisClient.SMembers(servicesKey).Val()
 	for _, svcIDStr := range svcIDs {
@@ -106,7 +107,7 @@ func serviceAddHandler(c *gin.Context) {
 		c.String(http.StatusBadRequest, "invalid request")
 		return
 	}
-	log.Printf("Request to add/update service: %d: %s - %s", postedSvc.ID, postedSvc.Name, postedSvc.URL)
+	log.Printf("Request to add service: %s - %s. Ping URL...", postedSvc.Name, postedSvc.URL)
 
 	// Before anything gets updated, ping the service and verify the response matches
 	// expected format: [ServiceName] Aries API
@@ -115,7 +116,7 @@ func serviceAddHandler(c *gin.Context) {
 		return
 	}
 
-	log.Printf("A new service is being added; get an ID for it")
+	log.Printf("Get ID for %s,", postedSvc.Name)
 	serviceIDKey := fmt.Sprintf("%s:next_service_id", redisKeyPrefix)
 	newID, err := redisClient.Incr(serviceIDKey).Result()
 	if err != nil {

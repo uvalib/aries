@@ -35,7 +35,9 @@ const getters = {
 // this.$store.commit('mutation_name') or called from asynchronous actions
 const mutations = {
   setServices (state, services) {
-    state.services = services
+    if (services) {
+      state.services = services
+    }
   },
 
   setError (state, error) {
@@ -91,7 +93,7 @@ const actions = {
   addService( ctx, newService ) {
     axios.post("/api/services", newService).then((response)  =>  {
       if (response.status == 200 ) {
-        ctx.commit('addService', updatedService )
+        ctx.commit('addService', newService )
       } else {
         ctx.commit('setError', "Add Failed: "+ response.data) 
       }
