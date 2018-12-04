@@ -53,7 +53,7 @@ func main() {
 
 	// NOTE: redisKeyPrefix is a string define in services.go
 	flag.StringVar(&redisKeyPrefix, "redis_prefix", "aries", "Redis key prefix")
-	
+
 	flag.Parse()
 
 	// Populate the service array with services known to Aries
@@ -75,6 +75,7 @@ func main() {
 		api.GET("/resources/:id", resourcesHandler)
 		api.GET("/services", servicesHandler)
 		api.POST("/services", serviceAddHandler)
+		api.PUT("/services", serviceUpdateHandler)
 	}
 	router.Use(static.Serve("/", static.LocalFile("./public", true)))
 

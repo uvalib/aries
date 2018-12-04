@@ -95,7 +95,7 @@ func servicesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, services)
 }
 
-// serviceAddHandler will add/update a service contained in the post params. It will then
+// serviceAddHandler will add a service contained in the post params. It will then
 // ping that service and ensure the response is the expected format
 // Call example: curl -d '{"id": "ID", "name":"NAME", "url":"URL"}' -H "Content-Type: application/json" -X POST https://aries.lib.virginia.edu/api/services
 func serviceAddHandler(c *gin.Context) {
@@ -115,45 +115,68 @@ func serviceAddHandler(c *gin.Context) {
 		return
 	}
 
-	// Service is OK. Update reddis and local data
+	log.Printf("A new service is being added; get an ID for it")
+	serviceIDKey := fmt.Sprintf("%s:next_service_id", redisKeyPrefix)
+	newID, err := redisClient.Incr(serviceIDKey).Result()
+	if err != nil {
+		log.Printf("Unable to get ID new service")
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	postedSvc.ID = newID
+	redisErr := updateRedis(&postedSvc, true)
+	if redisErr != nil {
+		log.Printf("Unable to get update redis %s", redisErr.Error())
+		c.String(http.StatusInternalServerError, redisErr.Error())
+		return
+	}
+	services = append(services, &postedSvc)
+
+	c.String(http.StatusOK, "%d", newID)
+}
+
+// serviceUpdateHandler will update the service contained in the post params
+func serviceUpdateHandler(c *gin.Context) {
+	var postedSvc serviceInfo
+	err := c.BindJSON(&postedSvc)
+	if err != nil {
+		log.Printf("Bad request to update service: %s", err.Error())
+		c.String(http.StatusBadRequest, "invalid request")
+		return
+	}
+	log.Printf("Request to update service: %d: %s - %s", postedSvc.ID, postedSvc.Name, postedSvc.URL)
+
 	// see if service is new or an existing one...
 	var existingService *serviceInfo
 	for _, svc := range services {
 		if svc.ID == postedSvc.ID {
-			log.Printf("Service %d exists; update it", svc.ID)
 			existingService = svc
 		}
 	}
 
 	if existingService == nil {
-		log.Printf("A new service is being added; get an ID for it")
-		serviceIDKey := fmt.Sprintf("%s:next_service_id", redisKeyPrefix)
-		newID, err := redisClient.Incr(serviceIDKey).Result()
-		if err != nil {
-			log.Printf("Unable to get ID new service")
-			c.String(http.StatusInternalServerError, err.Error())
-			return
-		}
-		postedSvc.ID = newID
-		redisErr := updateRedis(&postedSvc, true)
-		if redisErr != nil {
-			log.Printf("Unable to get update redis %s", redisErr.Error())
-			c.String(http.StatusInternalServerError, redisErr.Error())
-			return
-		}
-		services = append(services, &postedSvc)
-	} else {
-		redisErr := updateRedis(&postedSvc, false)
-		if redisErr != nil {
-			log.Printf("Unable to get update redis %s", redisErr.Error())
-			c.String(http.StatusInternalServerError, redisErr.Error())
-			return
-		}
-		existingService.Name = postedSvc.Name
-		existingService.URL = postedSvc.URL
+		log.Printf("Service %d not found", postedSvc.ID)
+		c.String(http.StatusBadRequest, "Service not found")
+		return
 	}
 
-	c.String(http.StatusOK, "ok")
+	if existingService.URL != postedSvc.URL {
+		if !pingService(&postedSvc, true) {
+			c.String(http.StatusBadRequest, "New URL is not valid")
+			return
+		}
+	}
+
+	redisErr := updateRedis(&postedSvc, false)
+	if redisErr != nil {
+		log.Printf("Unable to get update redis %s", redisErr.Error())
+		c.String(http.StatusInternalServerError, redisErr.Error())
+		return
+	}
+	existingService.Name = postedSvc.Name
+	existingService.URL = postedSvc.URL
+
+	c.String(http.StatusOK, "updated")
 }
 
 func updateRedis(svcInfo *serviceInfo, newService bool) error {

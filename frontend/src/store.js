@@ -77,7 +77,7 @@ const actions = {
   },
 
   updateService( ctx, updatedService ) {
-    axios.post("/api/services", updatedService).then((response)  =>  {
+    axios.put("/api/services", updatedService).then((response)  =>  {
       if (response.status == 200 ) {
         ctx.commit('updateService', updatedService )
       } else {
@@ -85,6 +85,18 @@ const actions = {
       }
     }).catch( error => {
       ctx.commit('setError', "Update Failed: "+ error.response.data) 
+    })
+  },
+
+  addService( ctx, newService ) {
+    axios.post("/api/services", newService).then((response)  =>  {
+      if (response.status == 200 ) {
+        ctx.commit('addService', updatedService )
+      } else {
+        ctx.commit('setError', "Add Failed: "+ response.data) 
+      }
+    }).catch( error => {
+      ctx.commit('setError', "Add Failed: "+ error.response.data) 
     })
   }
 }

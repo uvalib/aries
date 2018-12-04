@@ -3,7 +3,7 @@
     <h4>Aries Services<span @click="closeRepoList" class="hide-services">Close</span></h4>  
     <table>
       <tr>
-        <th></th><th>Service</th><th>URL</th><th style="text-align:center">Status</th>
+        <th style="text-align:center"><span @click="addServiceClick" class="icon add"></span></th><th>Service</th><th>URL</th><th style="text-align:center">Status</th>
       </tr>
       <tr v-for="svc in services"
           v-bind:key="svc.id">
@@ -29,6 +29,18 @@
           </td>
         </template>
       </tr>
+      <tr v-if="addingService"> 
+        <td colspan="2">
+            <input id="name-edit" placeholder="New Service Name"/>
+          </td>
+          <td >
+            <input id="url-edit" placeholder="New Service URL"/>
+          </td>
+          <td>
+            <span class="icon accept" @click="acceptAddClick"></span>
+            <span class="icon cancel" @click="cancelAddClick"></span>
+          </td>
+      </tr>
     </table>
   </div>
 </template>
@@ -44,6 +56,7 @@ export default {
   data: function () {
     return {
         editService: null,
+        addingService: false
     }
   },
 
@@ -78,7 +91,24 @@ export default {
       this.editService.url = input.value
       this.$store.dispatch('updateService', this.editService)
       this.editService = null
-    }
+    },
+
+    addServiceClick: function() {
+      this.addingService = true
+    },
+
+    acceptAddClick: function() {
+      let input = document.getElementById('name-edit')
+      let name = input.value
+      input = document.getElementById('url-edit')
+      let url = input.value
+      this.$store.dispatch('addService', {name: name, url: url})
+      this.addingService = false
+    },
+
+    cancelAddClick: function() {
+      this.addingService = false
+    },
   }
 }
 </script>
@@ -157,6 +187,9 @@ span.offline {
 .icon.cancel {
   background-image: url(../assets/cancel.png);
   margin: 0 0 0 4px;
+}
+.icon.add {
+  background-image: url(../assets/add.png);
 }
 input {
   width: 100%;
