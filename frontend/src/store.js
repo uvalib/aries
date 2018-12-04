@@ -78,16 +78,17 @@ const actions = {
     })
   },
 
-  updateService( ctx, updatedService ) {
-    axios.put("/api/services", updatedService).then((response)  =>  {
-      if (response.status == 200 ) {
+  async updateService( ctx, updatedService ) {
+    try {
+      let json = await axios.put("/api/services", updatedService)
+      if (json.status == 200) {
         ctx.commit('updateService', updatedService )
       } else {
-        ctx.commit('setError', "Update Failed: "+ response.data) 
+        ctx.commit('setError', "Update Failed: "+ json.data) 
       }
-    }).catch( error => {
+    } catch (error)  {
       ctx.commit('setError', "Update Failed: "+ error.response.data) 
-    })
+    }
   },
 
   addService( ctx, newService ) {

@@ -225,7 +225,7 @@ func getServiceURL(name string) string {
 // pingService will ping the service URL and return true if the service responds.
 // The status of the service object will be updated based on this test.
 func pingService(svc *serviceInfo, nameCheck bool) bool {
-	timeout := time.Duration(2 * time.Second)
+	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
