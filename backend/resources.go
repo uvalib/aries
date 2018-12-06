@@ -96,11 +96,12 @@ func getAriesResponse(svc *serviceInfo, id string, channel chan string) {
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	respString := string(bodyBytes)
 	if resp.StatusCode != 200 {
+		msg := fmt.Sprintf("%s not found", id)
 		channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": "%s", "response_time_ms": %d}`,
-			svc.Name, resp.StatusCode, respString, elapsedMS)
+			svc.Name, resp.StatusCode, msg, elapsedMS)
 		return
 	}
 
-	channel <- fmt.Sprintf(`{"system": "%s", "status": %d, "response": %s, "response_time_ms": %d}`,
-		svc.Name, resp.StatusCode, respString, elapsedMS)
+	channel <- fmt.Sprintf(`{"system": "%s", "status": 200, "response": %s, "response_time_ms": %d}`,
+		svc.Name, respString, elapsedMS)
 }
