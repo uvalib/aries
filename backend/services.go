@@ -147,7 +147,7 @@ func serviceUpdateHandler(c *gin.Context) {
 	}
 	log.Printf("Request to update service: %d: %s - %s", postedSvc.ID, postedSvc.Name, postedSvc.URL)
 
-	// see if service is new or an existing one...
+	// Find existing service...
 	var existingService *serviceInfo
 	for _, svc := range services {
 		if svc.ID == postedSvc.ID {
@@ -161,6 +161,7 @@ func serviceUpdateHandler(c *gin.Context) {
 		return
 	}
 
+	// Only need to ping service if the URL is to be changed by the update
 	if existingService.URL != postedSvc.URL {
 		if !pingService(&postedSvc, true) {
 			c.String(http.StatusBadRequest, "New URL is not valid")

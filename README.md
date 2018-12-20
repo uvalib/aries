@@ -5,7 +5,7 @@ As opposed to a monolithic repository, the UVA digital repository solution invol
 The goal of Aries is to provide a method for seeing the full picture in a coherent way.
 
 ### System Requirements
-* GO version 1.11 or greater
+* GO version 1.11 or greater (mod required)
 * Node version 8.11.1 or higher (https://nodejs.org/en/)
 * Yarn version 1.9.3 or greater
 * vue-cli 3 version 3.0.3 or greater
@@ -23,10 +23,12 @@ The goal of Aries is to provide a method for seeing the full picture in a cohere
 * GET /healthcheck : test health of system components; results returned as JSON.
 * GET /resources/:ID : Get a block of JSON data containing details about the specified resource.
 * GET /services : Get a JSON list services that are a part of the aries constellation.
-* POST /services : Add a new service or update an existing service. 
+* POST /services : Add a new service
    * JSON Payload: {"name":"NAME", "url":"URL"}. 
    * Example: `curl -d '{"name":"NAME", "url":"URL"}' -H "Content-Type: application/json" -X POST https://aries.lib.virginia.edu/api/services`
    * Note: before add or update, the service will be pinged and the response scanned for expected content. If not present, the POT will fail. 
+* PUT /services : Update an existing service
+   * Same payload and notes as POST
 
 ### Notes
 
