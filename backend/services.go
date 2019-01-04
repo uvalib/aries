@@ -79,7 +79,7 @@ func initServices(host string, port int, pass string) error {
 	// Start a ticker to periodically poll servivces and mark them
 	// active or inactive. The weird syntax puts the polling of
 	// the ticker channel an a goroutine so it doesn't block
-	ticker := time.NewTicker(60 * time.Second)
+	ticker := time.NewTicker(60 * time.Minute)
 	go func() {
 		for range ticker.C {
 			log.Printf("Service check heartbeat")
