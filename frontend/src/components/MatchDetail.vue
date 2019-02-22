@@ -29,7 +29,7 @@
       <template v-if="metadataURLs">
         <div class="pure-u-1-4 label"><span>Metadata URL:</span></div>
         <div class="pure-u-3-4 data">
-          <MatchDetailItemList :items="metadataURLs"/>
+          <MatchDetailURLList :urls="metadataURLs"/>
         </div>
       </template>
 
