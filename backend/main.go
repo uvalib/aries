@@ -11,7 +11,7 @@ import (
 )
 
 // Version of the service
-const version = "1.2.3"
+const version = "1.3.0"
 
 // favHandler is a dummy handler to silence browser API requests that look for /favicon.ico
 func favHandler(c *gin.Context) {
