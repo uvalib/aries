@@ -789,7 +789,7 @@
   resolved "https://registry.yarnpkg.com/@vue/cli-overlay/-/cli-overlay-3.4.1.tgz#f850c2f8d7cd42b475d03ec6658ccf2ec9830511"
   integrity sha512-mO0680PClML4lj6ruH+YV3BwPjxvJ4HkgsyMlmCyOZimQBxifvjK/6MX2p179M1QoJtSaz8omRJ7a6/mAP5SXg==
 
-"@vue/cli-plugin-babel@^3.4.0":
+"@vue/cli-plugin-babel@^3.4.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@vue/cli-plugin-babel/-/cli-plugin-babel-3.4.1.tgz#f84fe329966ab5c82c80da1bd62da4db4089090b"
   integrity sha512-KimYe71sU7elxjUUN4U8+/mggoDSZE9ooYA0CCZdSR+Le0LDF65Kd7PdgE2MODESYCpsMccuA0peM7nVzoBU2A==
@@ -800,7 +800,7 @@
     babel-loader "^8.0.5"
     webpack ">=4 < 4.29"
 
-"@vue/cli-plugin-eslint@^3.4.0":
+"@vue/cli-plugin-eslint@^3.4.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@vue/cli-plugin-eslint/-/cli-plugin-eslint-3.4.1.tgz#59896379e12d68aefcdccac28c691cb6e23e5720"
   integrity sha512-1Ka7PyEatxkpoHEz2u5J/4E2joaUFs0UDrvsKLVbtz05LYpv/HHwFWCmhbZPZ1GSLDeEewwQ11fBgeQZAE5TYw==
@@ -814,7 +814,7 @@
     eslint "^4.19.1"
     eslint-plugin-vue "^4.7.1"
 
-"@vue/cli-service@^3.4.0":
+"@vue/cli-service@^3.4.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@vue/cli-service/-/cli-service-3.4.1.tgz#65ef3ed00b8e6eeeca736308a703c264cfa280cc"
   integrity sha512-HAF2yeafVJVKiBaapvbVIK4cM+lDU4r6aJzbKLOonzQrnI45T2NLEvYC+9uW7C5LvC1d4g1XUx25Q8ixSBKegQ==
@@ -1111,9 +1111,9 @@ acorn@^5.0.0, acorn@^5.5.0, acorn@^5.6.2, acorn@^5.7.3:
   integrity sha512-T/zvzYRfbVojPWahDsE5evJdHb3oJoQfFbsrKM7w5Zcs++Tr257tia3BmMP8XYVjp1S9RZXQMh7gao96BlqZOw==
 
 acorn@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.1.0.tgz#b0a3be31752c97a0f7013c5f4903b71a05db6818"
-  integrity sha512-MW/FjM+IvU9CgBzjO3UIPCE2pyEwUsoFl+VGdczOPEdxfGFjuKny/gN54mOuX7Qxmb9Rg9MCn2oKiSUeW+pjrw==
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.1.1.tgz#7d25ae05bb8ad1f9b699108e1094ecd7884adc1f"
+  integrity sha512-jPTiwtOxaHNaAPg/dmrJ/beuzLRnXtB0kQPQ8JpotKJgTB6rX6c8mlf315941pyjBSaPg8NHXS9fhP4u17DpGA==
 
 address@^1.0.3:
   version "1.0.3"
@@ -7374,7 +7374,7 @@ vue-style-loader@^4.1.0:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
 
-vue-template-compiler@^2.5.17:
+vue-template-compiler@^2.6.7:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.6.7.tgz#7f6c14eacf3c912d28d33b029cde706d9756e00c"
   integrity sha512-ZjxJLr6Lw2gj6aQGKwBWTxVNNd28/qggIdwvr5ushrUHUvqgbHD0xusOVP2yRxT4pX3wRIJ2LfxjgFT41dEtoQ==
