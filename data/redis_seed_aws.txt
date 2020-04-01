@@ -1,0 +1,23 @@
+incr aries:next_service_id 
+hmset aries:service:1 name "Apollo" url "https://apollo.lib.virginia.edu/api"
+incr aries:next_service_id 
+hmset aries:service:2 name "TrackSys" url "https://tracksys.lib.virginia.edu/api"
+incr aries:next_service_id 
+hmset aries:service:3 name "IIIF" url "http://dockerprod1.lib.virginia.edu:8419/api"
+incr aries:next_service_id 
+hmset aries:service:4 name "Archivematica" url "http://aries-archivematica-staging.private.staging:8088/api"
+incr aries:next_service_id 
+hmset aries:service:5 name "IIIF Manifest" url "https://iiifman.lib.virginia.edu/api"
+incr aries:next_service_id 
+hmset aries:service:6 name "PDF Hosting" url "http://dockerprod1.lib.virginia.edu:8316/api"
+incr aries:next_service_id 
+hmset aries:service:7 name "Curio" url "http://curio-staging.private.staging:8085/api"
+incr aries:next_service_id 
+hmset aries:service:8 name "APTrust" url "http://aries-aptrust-staging.private.staging:8080/api"
+incr aries:next_service_id 
+hmset aries:service:9 name "Virgo" url "http://aries-virgo-staging.private.staging:8080/api"
+incr aries:next_service_id 
+hmset aries:service:10 name "Avalon" url "http://aries-avalon-staging.private.staging:8080/api"
+incr aries:next_service_id 
+hmset aries:service:11 name "JSTOR" url "http://aries-jstor-staging.private.staging:8080/api"
+sadd aries:services 1 2 3 4 5 6 7 8 9 10 11
