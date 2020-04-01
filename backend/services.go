@@ -30,14 +30,23 @@ var redisClient *redis.Client
 
 // initServices will read services from the specified redis instance and create a list of services.
 // Each one will be will be checked to see if it is alive and this status is tracked.
-func initServices(host string, port int, pass string) error {
+func initServices(host string, port int, pass string, db int) error {
 	redisHost := fmt.Sprintf("%s:%d", host, port)
 	log.Printf("Connect to redis instance at %s", redisHost)
-	redisClient = redis.NewClient(&redis.Options{
-		Addr:     redisHost,
-		Password: pass,
-		DB:       0, // use default DB
-	})
+
+	// if we have a blank password
+	if len( pass ) == 0 {
+		redisClient = redis.NewClient(&redis.Options{
+			Addr:     redisHost,
+			DB:       db,
+		})
+	} else {
+		redisClient = redis.NewClient(&redis.Options{
+			Addr:     redisHost,
+			Password: pass,
+			DB:       db,
+		})
+	}
 
 	// See if the connection is good...
 	_, err := redisClient.Ping().Result()

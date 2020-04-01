@@ -44,11 +44,12 @@ func main() {
 
 	// Get config params; service port and redis info
 	log.Printf("Read configuration...")
-	var port, redisPort int
+	var port, redisPort, redisDB int
 	var redisHost, redisPass string
 	flag.IntVar(&port, "port", 8080, "Aries port (default 8080)")
 	flag.StringVar(&redisHost, "redis_host", "localhost", "Redis host (default localhost)")
 	flag.IntVar(&redisPort, "redis_port", 6379, "Redis port (default 6379)")
+	flag.IntVar(&redisDB, "redis_db", 0, "Redis database (default 0)")
 	flag.StringVar(&redisPass, "redis_pass", "", "Redis password")
 
 	// NOTE: redisKeyPrefix is a string define in services.go
@@ -58,7 +59,7 @@ func main() {
 
 	// Populate the service array with services known to Aries
 	log.Printf("Init Services...")
-	err := initServices(redisHost, redisPort, redisPass)
+	err := initServices(redisHost, redisPort, redisPass, redisDB)
 	if err != nil {
 		log.Fatal("Unable to load services info")
 	}
