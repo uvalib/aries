@@ -7,7 +7,7 @@ hmset aries:service:3 name "IIIF" url "http://dockerprod1.lib.virginia.edu:8419/
 incr aries:next_service_id 
 hmset aries:service:4 name "Archivematica" url "http://aries-archivematica-staging.private.staging:8088/api"
 incr aries:next_service_id 
-hmset aries:service:5 name "IIIF Manifest" url "https://iiifman.lib.virginia.edu/api"
+hmset aries:service:5 name "IIIF Manifest" url "http://iiif-manifest-staging.private.staging:8080/api"
 incr aries:next_service_id 
 hmset aries:service:6 name "PDF Hosting" url "http://dockerprod1.lib.virginia.edu:8316/api"
 incr aries:next_service_id 
