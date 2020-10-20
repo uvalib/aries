@@ -53,7 +53,8 @@ COPY --from=builder /build/bin/public/img $APP_HOME/bin/public/img
 RUN chown webservice:webservice /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/bin/aries && chmod 755 /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/bin/aries
 
 # Add the build tag
-COPY buildtag.* $APP_HOME/
+ARG BUILD_TAG
+RUN test -n "$BUILD_TAG" && touch $APP_HOME/buildtag.build-$BUILD_TAG || touch $APP_HOME/buildtag.build-0
 
 # Specify the user
 USER webservice
