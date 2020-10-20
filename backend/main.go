@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -19,7 +21,19 @@ func favHandler(c *gin.Context) {
 
 // versionHandler reports the version of the serivce
 func versionHandler(c *gin.Context) {
-	c.String(http.StatusOK, "Aries version %s", version)
+
+	build := "unknown"
+
+	// cos our CWD is the bin directory
+	files, _ := filepath.Glob("../buildtag.*")
+	if len(files) == 1 {
+		build = strings.Replace(files[0], "../buildtag.", "", 1)
+	}
+
+	vMap := make(map[string]string)
+	vMap["version"] = version
+	vMap["build"] = build
+	c.JSON(http.StatusOK, vMap)
 }
 
 // healthCheckHandler reports the health of the serivce
