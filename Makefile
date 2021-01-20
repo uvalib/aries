@@ -31,6 +31,11 @@ clean:
 	$(GOCLEAN)
 	rm -rf bin
 
+dep:
+	cd backend; $(GOGET) -u
+	$(GOMOD) tidy
+	$(GOMOD) verify
+
 fmt:
 	cd backend; $(GOFMT)
 
