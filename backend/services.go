@@ -35,10 +35,10 @@ func initServices(host string, port int, pass string, db int) error {
 	log.Printf("Connect to redis instance at %s", redisHost)
 
 	// if we have a blank password
-	if len( pass ) == 0 {
+	if len(pass) == 0 {
 		redisClient = redis.NewClient(&redis.Options{
-			Addr:     redisHost,
-			DB:       db,
+			Addr: redisHost,
+			DB:   db,
 		})
 	} else {
 		redisClient = redis.NewClient(&redis.Options{

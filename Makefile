@@ -1,7 +1,11 @@
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
+GOCMD = go
+GOBUILD = $(GOCMD) build
+GOCLEAN = $(GOCMD) clean
+GOTEST = $(GOCMD) test
+GOGET = $(GOCMD) get
+GOMOD = $(GOCMD) mod
+GOFMT = $(GOCMD) fmt
+GOVET = $(GOCMD) vet
 
 build: darwin web
 
@@ -26,3 +30,10 @@ linux:
 clean:
 	$(GOCLEAN)
 	rm -rf bin
+
+fmt:
+	cd backend; $(GOFMT)
+
+vet:
+	cd backend; $(GOVET)
+
