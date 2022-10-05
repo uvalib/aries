@@ -2,3 +2,4 @@
 .idea
 bin
 data
+frontend/node_modules
